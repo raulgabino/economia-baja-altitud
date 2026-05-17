@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ley de Economía de Baja Altitud — Nuevo León</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bone: #FAF8F4;
+  --ink: #1A1A1A;
+  --accent: #1B4332;
+  --accent-light: rgba(27, 67, 50, 0.08);
+  --grey: #6B6B6B;
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Inter Tight', -apple-system, sans-serif;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bone);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 400;
+  line-height: 1.6;
+  padding: 0;
+  margin: 0;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bone);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+  padding: 6px 24px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+main {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+}
+
+/* — Altitude diagram — */
+.altitude-diagram {
+  margin: 0 -24px 48px;
+  overflow: hidden;
+}
+
+.altitude-diagram svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+h1 {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  line-height: 1.2;
+  margin-bottom: 24px;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.meta {
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--grey);
+  margin-bottom: 56px;
+  line-height: 1.5;
+}
+
+.meta span {
+  display: inline-block;
+  margin-right: 16px;
+}
+
+h2 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: clamp(1.25rem, 3.5vw, 1.6rem);
+  line-height: 1.25;
+  margin-top: 64px;
+  margin-bottom: 20px;
+  color: var(--ink);
+}
+
+h3 {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-top: 40px;
+  margin-bottom: 12px;
+}
+
+p {
+  margin-bottom: 20px;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.lead {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
+  line-height: 1.5;
+  font-weight: 300;
+  margin-bottom: 32px;
+}
+
+/* — Pull quote — */
+.pull-quote {
+  margin: 48px 0;
+  padding: 0 0 0 24px;
+  border-left: 3px solid var(--accent);
+}
+
+.pull-quote p {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(1.15rem, 3vw, 1.35rem);
+  line-height: 1.45;
+  color: var(--ink);
+  margin-bottom: 0;
+}
+
+/* — Section divider with mountain silhouette — */
+.section-divider {
+  width: 40px;
+  height: 2px;
+  background: var(--accent);
+  margin: 64px 0 48px;
+}
+
+.mountain-break {
+  margin: 64px -24px 48px;
+  text-align: center;
+  opacity: 0.12;
+}
+
+.mountain-break svg {
+  width: 100%;
+  max-width: 680px;
+  height: auto;
+}
+
+ol.editorial-list {
+  list-style: none;
+  counter-reset: item;
+  padding: 0;
+  margin-bottom: 24px;
+}
+
+ol.editorial-list li {
+  counter-increment: item;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.06);
+  font-size: 1rem;
+  line-height: 1.55;
+  padding-left: 40px;
+  position: relative;
+}
+
+ol.editorial-list li::before {
+  content: counter(item);
+  position: absolute;
+  left: 0;
+  top: 12px;
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+/* — Two columns — */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin: 32px 0;
+}
+
+@media (max-width: 520px) {
+  .two-col {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+.two-col-header {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--accent);
+}
+
+.two-col ul {
+  list-style: none;
+  padding: 0;
+}
+
+.two-col li {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.05);
+}
+
+/* — Stats with bar visualization — */
+.stat-block {
+  margin: 40px 0;
+  padding: 0;
+}
+
+.stat-item {
+  margin-bottom: 44px;
+}
+
+.stat-number {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(3rem, 12vw, 5rem);
+  line-height: 1;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.stat-unit {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  color: var(--accent);
+}
+
+.stat-label {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--grey);
+  margin-top: 4px;
+}
+
+.stat-context {
+  font-size: 0.9rem;
+  color: var(--grey);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.stat-bar {
+  margin-top: 12px;
+  height: 6px;
+  background: var(--accent-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+}
+
+/* — Sector benefits grid — */
+.benefit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin: 32px 0;
+  border-top: 1px solid rgba(26, 26, 26, 0.1);
+  border-left: 1px solid rgba(26, 26, 26, 0.1);
+}
+
+@media (max-width: 480px) {
+  .benefit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.benefit-cell {
+  padding: 24px 20px;
+  border-right: 1px solid rgba(26, 26, 26, 0.1);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.1);
+}
+
+.benefit-cell-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.benefit-cell-desc {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--grey);
+}
+
+.benefit-cell svg {
+  display: block;
+  margin-bottom: 12px;
+}
+
+/* — Comparison — */
+.comparison-block {
+  margin: 40px 0;
+}
+
+.comparison-item {
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+}
+
+.comparison-item:first-child {
+  border-top: 1px solid rgba(26, 26, 26, 0.08);
+}
+
+.comparison-place {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 2px;
+}
+
+.comparison-year {
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  color: var(--grey);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.comparison-desc {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+.bar-chart {
+  margin: 32px 0;
+}
+
+.bar-chart svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* — Stage list — */
+.stage-list {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0;
+}
+
+.stage-list li {
+  padding: 10px 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.05);
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.stage-status {
+  font-family: var(--sans);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  min-width: 72px;
+}
+
+.stage-status.done { color: var(--accent); }
+.stage-status.wip { color: #8B6914; }
+.stage-status.pending { color: var(--grey); }
+
+/* — Progress vis — */
+.progress-vis {
+  margin: 32px 0;
+}
+
+.progress-vis svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* — Closing — */
+.closing {
+  margin-top: 72px;
+  padding-top: 32px;
+  border-top: 2px solid var(--ink);
+}
+
+.closing p {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.author {
+  margin-top: 32px;
+  font-size: 0.85rem;
+  color: var(--grey);
+}
+
+strong { font-weight: 600; }
+em { font-style: italic; }
+
+@media (min-width: 768px) {
+  main {
+    padding: 72px 24px 120px;
+  }
+  .altitude-diagram {
+    margin-left: -60px;
+    margin-right: -60px;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar" role="banner">Economía de baja altitud · Nuevo León</div>
+
+<main>
+
+  <!-- Altitude zone diagram -->
+  <div class="altitude-diagram" aria-label="Diagrama de zona de baja altitud: 0 a 300 metros">
+    <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Corte vertical del espacio aéreo bajo: terreno, zona de actividad de 0 a 300 metros, y cielo abierto">
+      <!-- Sky -->
+      <rect x="0" y="0" width="800" height="100" fill="#E8EDE9"/>
+      <!-- Low altitude zone -->
+      <rect x="0" y="100" width="800" height="80" fill="rgba(27,67,50,0.07)"/>
+      <!-- Ground -->
+      <path d="M0 180 Q100 165 200 172 Q300 178 400 170 Q500 162 600 175 Q700 180 800 168 L800 220 L0 220Z" fill="#D4CFC4"/>
+      <!-- Mountain silhouette -->
+      <path d="M0 180 L80 140 L130 160 L200 110 L260 145 L320 100 L380 135 L420 120 L480 155 L520 130 L580 150 L640 115 L700 148 L750 135 L800 160 L800 220 L0 220Z" fill="#B8B2A6" opacity="0.5"/>
+      <path d="M50 180 L150 150 L220 165 L300 125 L370 155 L430 140 L500 168 L560 145 L630 158 L700 138 L800 170 L800 220 L0 220Z" fill="#A39D91" opacity="0.4"/>
+      <!-- Labels -->
+      <text x="20" y="50" font-family="Inter Tight, sans-serif" font-size="9" fill="#6B6B6B" text-transform="uppercase" letter-spacing="1">Espacio aéreo controlado</text>
+      <text x="20" y="92" font-family="Inter Tight, sans-serif" font-size="9" fill="#1B4332" font-weight="600" letter-spacing="1">ZONA DE BAJA ALTITUD</text>
+      <!-- Altitude markers -->
+      <line x1="760" y1="100" x2="760" y2="180" stroke="#1B4332" stroke-width="1.5"/>
+      <line x1="753" y1="100" x2="767" y2="100" stroke="#1B4332" stroke-width="1.5"/>
+      <line x1="753" y1="180" x2="767" y2="180" stroke="#1B4332" stroke-width="1.5"/>
+      <text x="748" y="145" font-family="Fraunces, serif" font-size="14" font-weight="700" fill="#1B4332" text-anchor="end">300m</text>
+      <!-- Drone shapes (abstract) -->
+      <line x1="180" y1="130" x2="200" y2="130" stroke="#1B4332" stroke-width="1.5" opacity="0.5"/>
+      <line x1="190" y1="124" x2="190" y2="136" stroke="#1B4332" stroke-width="1.5" opacity="0.5"/>
+      <circle cx="190" cy="130" r="3" fill="#1B4332" opacity="0.4"/>
+      <line x1="480" y1="115" x2="500" y2="115" stroke="#1B4332" stroke-width="1.5" opacity="0.5"/>
+      <line x1="490" y1="109" x2="490" y2="121" stroke="#1B4332" stroke-width="1.5" opacity="0.5"/>
+      <circle cx="490" cy="115" r="3" fill="#1B4332" opacity="0.4"/>
+      <line x1="620" y1="140" x2="640" y2="140" stroke="#1B4332" stroke-width="1.5" opacity="0.35"/>
+      <line x1="630" y1="134" x2="630" y2="146" stroke="#1B4332" stroke-width="1.5" opacity="0.35"/>
+      <circle cx="630" cy="140" r="3" fill="#1B4332" opacity="0.3"/>
+    </svg>
+  </div>
+
+  <h1>Una ley para que Nuevo León use el espacio aéreo bajo —los primeros 300 metros— como motor de empleo, logística e innovación.</h1>
+
+  <div class="meta">
+    <span>Mayo 2026</span>
+    <span>Iniciativa en formación</span>
+    <span>Raúl Gabino</span>
+  </div>
+
+  <p class="lead">La economía de baja altitud abarca todo lo que vuela por debajo de 300 metros con fines civiles: drones de carga, agricultura de precisión, inspección de infraestructura, monitoreo ambiental, transporte eléctrico vertical de pasajeros. Es un sector que ya generó regulación propia en China y Estados Unidos. México aún no tiene una ley estatal que lo reconozca.</p>
+
+  <p>Esta iniciativa de ley propone que Nuevo León sea el primer Estado en hacerlo.</p>
+
+  <div class="section-divider"></div>
+
+  <h2>¿Por qué ahora?</h2>
+
+  <p>Cuatro hechos definen la ventana de oportunidad:</p>
+
+  <p><strong>El sector ya existe y crece rápido.</strong> La agricultura con drones reduce entre 30% y 40% el uso de agroquímicos. La logística aérea de última milla opera comercialmente en Shenzhen desde 2024. Los vehículos eléctricos de despegue vertical (eVTOL) tienen fecha de certificación en Estados Unidos para 2025-2026.</p>
+
+  <p><strong>Otros ya legislaron.</strong> Shenzhen publicó la primera ordenanza del mundo sobre economía de baja altitud el 1 de febrero de 2024. China declaró ese año como "año inaugural" del sector. La FAA Reauthorization Act de 2024 regula "Advanced Air Mobility" en EE.&nbsp;UU. Europa tiene el paquete U-space.</p>
+
+  <p><strong>México no tiene ley estatal.</strong> La regulación aeronáutica federal (AFAC) se ocupa de seguridad operacional. Pero el fomento económico, la formación de talento, los estímulos fiscales locales y la reserva de suelo son competencia de los estados. Esa pieza falta.</p>
+
+  <div class="pull-quote">
+    <p>Sin marco estatal, la inversión no aterriza, el talento se va, el sector no crece.</p>
+  </div>
+
+  <p><strong>Nuevo León tiene condiciones para liderar.</strong> Es la economía industrial más grande del norte de México. Tiene frontera con Texas, un ecosistema de manufactura avanzada consolidado, universidades de primer nivel, la zona metropolitana de Monterrey con más de 5 millones de habitantes y una orografía de sierra que demanda soluciones aéreas para monitoreo y emergencias.</p>
+
+  <!-- Mountain silhouette break -->
+  <div class="mountain-break" aria-hidden="true">
+    <svg viewBox="0 0 800 60" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 60 L40 35 L100 45 L160 20 L220 40 L280 15 L340 38 L380 8 L420 30 L460 22 L520 42 L560 18 L620 35 L680 12 L740 32 L800 25 L800 60Z" fill="#1A1A1A"/>
+    </svg>
+  </div>
+
+  <h2>Qué hace la ley</h2>
+
+  <p>Cinco acciones concretas:</p>
+
+  <ol class="editorial-list">
+    <li><strong>Reconoce a la economía de baja altitud como sector estratégico del Estado.</strong> Esto no es simbólico: habilita presupuesto, programas y criterios para la toma de decisiones sectoriales.</li>
+    <li><strong>Crea un Consejo Estatal tripartito</strong> —gobierno, academia, sector privado— que define prioridades, asigna recursos y evalúa resultados.</li>
+    <li><strong>Activa estímulos fiscales locales</strong> para empresas que inviertan en el sector: reducciones en impuesto sobre nómina, derechos de registro o cuotas de licencia, según diseñe el Ejecutivo.</li>
+    <li><strong>Reserva suelo apto</strong> en los programas de desarrollo urbano municipal para vertipuertos, centros de operación de drones e infraestructura terrestre del sector.</li>
+    <li><strong>Crea un Programa Estatal de Formación de Capital Humano</strong> para los empleos que el sector necesita: pilotos de drones certificados, técnicos en mantenimiento, desarrolladores de software de navegación, operadores logísticos.</li>
+  </ol>
+
+  <div class="section-divider"></div>
+
+  <h2>Qué no hace la ley</h2>
+
+  <p>Esto es tan importante como lo anterior. La iniciativa respeta la distribución constitucional de competencias. No invade lo federal.</p>
+
+  <div class="two-col">
+    <div>
+      <div class="two-col-header">Lo que regula el Estado</div>
+      <ul>
+        <li>Fomento económico y estímulos fiscales</li>
+        <li>Formación de capital humano</li>
+        <li>Reserva y uso de suelo</li>
+        <li>Política industrial y clústeres</li>
+        <li>Gobernanza y coordinación sectorial</li>
+      </ul>
+    </div>
+    <div>
+      <div class="two-col-header">Lo que sigue siendo federal</div>
+      <ul>
+        <li>Regulación del vuelo (AFAC)</li>
+        <li>Certificación de aeronaves</li>
+        <li>Licencias de pilotos</li>
+        <li>Normas técnicas aeronáuticas</li>
+        <li>Gestión del espacio aéreo</li>
+      </ul>
+    </div>
+  </div>
+
+  <p>La ley no certifica drones, no emite permisos de vuelo, no invade el espacio aéreo. Regula lo que rodea al vuelo por abajo: el ecosistema económico que lo hace posible.</p>
+
+  <!-- Mountain break -->
+  <div class="mountain-break" aria-hidden="true">
+    <svg viewBox="0 0 800 50" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 50 L60 30 L140 40 L200 15 L280 35 L340 10 L400 28 L460 20 L540 38 L600 14 L680 30 L740 22 L800 35 L800 50Z" fill="#1A1A1A"/>
+    </svg>
+  </div>
+
+  <h2>Beneficios concretos</h2>
+
+  <div class="stat-block">
+    <div class="stat-item">
+      <div class="stat-number">80<span class="stat-unit">+</span></div>
+      <div class="stat-label">Empresas aeroespaciales en Querétaro</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width: 80%"></div></div>
+      <div class="stat-context">Instaladas en menos de dos décadas, sin ley específica de fomento. El precedente existe; con marco legal, esperamos mayor velocidad.</div>
+    </div>
+
+    <div class="stat-item">
+      <div class="stat-number">8,000<span class="stat-unit">+</span></div>
+      <div class="stat-label">Empleos especializados creados en ese clúster</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width: 65%"></div></div>
+      <div class="stat-context">Querétaro operó con programas, parque industrial y universidad. Nuevo León puede partir con una estructura legal desde el inicio.</div>
+    </div>
+
+    <div class="stat-item">
+      <div class="stat-number">30–40<span class="stat-unit">%</span></div>
+      <div class="stat-label">Reducción en uso de agroquímicos con drones</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width: 37%"></div></div>
+      <div class="stat-context">La región citrícola de Nuevo León —Montemorelos, Allende, General Terán— tiene mercado inmediato para precisión aérea.</div>
+    </div>
+
+    <div class="stat-item">
+      <div class="stat-number">5.3<span class="stat-unit">M</span></div>
+      <div class="stat-label">Habitantes en la zona metropolitana de Monterrey</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width: 90%"></div></div>
+      <div class="stat-context">La tercera zona metropolitana más grande de México. La logística aérea de última milla tiene aquí escala suficiente para operar.</div>
+    </div>
+  </div>
+
+  <h3>Otros beneficios sectoriales</h3>
+
+  <div class="benefit-grid">
+    <div class="benefit-cell">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M16 4L20 12L28 14L22 20L23 28L16 24L9 28L10 20L4 14L12 12Z" stroke="#1B4332" stroke-width="1.5" fill="none"/>
+      </svg>
+      <div class="benefit-cell-title">Emergencias</div>
+      <div class="benefit-cell-desc">Incendios en la Sierra Madre, deslaves tras lluvias atípicas, búsqueda y rescate en cañones de difícil acceso.</div>
+    </div>
+    <div class="benefit-cell">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <rect x="6" y="14" width="20" height="12" rx="2" stroke="#1B4332" stroke-width="1.5"/>
+        <path d="M6 18H26" stroke="#1B4332" stroke-width="1.5"/>
+        <path d="M13 6L16 14L19 6" stroke="#1B4332" stroke-width="1.5" fill="none"/>
+      </svg>
+      <div class="benefit-cell-title">Inspección industrial</div>
+      <div class="benefit-cell-desc">Plantas siderúrgicas, cementeras, automotrices. Monitoreo de infraestructura sin detener operaciones.</div>
+    </div>
+    <div class="benefit-cell">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="16" cy="16" r="10" stroke="#1B4332" stroke-width="1.5"/>
+        <path d="M16 6V16L22 22" stroke="#1B4332" stroke-width="1.5"/>
+      </svg>
+      <div class="benefit-cell-title">Logística fronteriza</div>
+      <div class="benefit-cell-desc">Inventarios, inspección de carga, distribución de última milla en el corredor Monterrey-Laredo.</div>
+    </div>
+    <div class="benefit-cell">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M4 28L10 16L16 20L22 10L28 14" stroke="#1B4332" stroke-width="1.5" fill="none"/>
+        <circle cx="10" cy="16" r="2" fill="#1B4332"/>
+        <circle cx="22" cy="10" r="2" fill="#1B4332"/>
+      </svg>
+      <div class="benefit-cell-title">Turismo aéreo</div>
+      <div class="benefit-cell-desc">Cumbres de Monterrey, Cañón de la Huasteca, Cola de Caballo. Experiencias que no requieren aeropuerto.</div>
+    </div>
+    <div class="benefit-cell">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M8 28V12L16 4L24 12V28" stroke="#1B4332" stroke-width="1.5" fill="none"/>
+        <rect x="13" y="18" width="6" height="10" stroke="#1B4332" stroke-width="1.5"/>
+      </svg>
+      <div class="benefit-cell-title">Obra pública</div>
+      <div class="benefit-cell-desc">Monitoreo de avance en proyectos de infraestructura metropolitana con drones de precisión.</div>
+    </div>
+    <div class="benefit-cell">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M6 24Q10 16 16 16Q22 16 26 24" stroke="#1B4332" stroke-width="1.5" fill="none"/>
+        <path d="M6 20Q10 12 16 12Q22 12 26 20" stroke="#1B4332" stroke-width="1.5" fill="none" opacity="0.5"/>
+        <path d="M6 16Q10 8 16 8Q22 8 26 16" stroke="#1B4332" stroke-width="1.5" fill="none" opacity="0.25"/>
+      </svg>
+      <div class="benefit-cell-title">Agricultura de precisión</div>
+      <div class="benefit-cell-desc">Cítricos, nuez, ganadería. Reducción en agroquímicos y optimización de riego en la región sur del Estado.</div>
+    </div>
+  </div>
+
+  <!-- Mountain break -->
+  <div class="mountain-break" aria-hidden="true">
+    <svg viewBox="0 0 800 50" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0 50 L80 28 L160 42 L240 12 L320 32 L380 6 L440 25 L520 35 L580 16 L660 38 L720 20 L800 30 L800 50Z" fill="#1A1A1A"/>
+    </svg>
+  </div>
+
+  <h2>Cómo se compara con otros lugares</h2>
+
+  <div class="comparison-block">
+    <div class="comparison-item">
+      <div class="comparison-place">Shenzhen, China</div>
+      <div class="comparison-year">Febrero 2024</div>
+      <div class="comparison-desc">Primera ordenanza municipal del mundo sobre economía de baja altitud. Cubre fomento, infraestructura, gestión de vuelo y seguridad. Modelo integral a nivel ciudad.</div>
+    </div>
+    <div class="comparison-item">
+      <div class="comparison-place">Florida, Estados Unidos</div>
+      <div class="comparison-year">2024</div>
+      <div class="comparison-desc">Regulación subnacional más detallada en Advanced Air Mobility dentro de EE.&nbsp;UU. Define zonas, incentivos y coordinación con la FAA federal.</div>
+    </div>
+    <div class="comparison-item">
+      <div class="comparison-place">Querétaro, México</div>
+      <div class="comparison-year">2005–presente</div>
+      <div class="comparison-desc">Clúster aeroespacial con 80+ empresas y 8,000+ empleos. Construido con programas e infraestructura, sin ley específica. Demuestra que el modelo funciona en México.</div>
+    </div>
+  </div>
+
+  <div class="bar-chart" aria-label="Línea de tiempo comparativa">
+    <svg viewBox="0 0 600 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Línea de tiempo: Querétaro 2005, Shenzhen y Florida 2024, Nuevo León 2026">
+      <line x1="60" y1="65" x2="560" y2="65" stroke="#1A1A1A" stroke-width="1" stroke-opacity="0.15"/>
+      <!-- Querétaro -->
+      <circle cx="100" cy="65" r="4" fill="#6B6B6B"/>
+      <line x1="100" y1="45" x2="100" y2="61" stroke="#6B6B6B" stroke-width="1" stroke-dasharray="2 2"/>
+      <text x="100" y="38" text-anchor="middle" font-family="Fraunces, serif" font-size="12" font-weight="600" fill="#6B6B6B">2005</text>
+      <text x="100" y="85" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="10" fill="#1A1A1A">Querétaro</text>
+      <text x="100" y="98" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="8" fill="#6B6B6B">Sin ley</text>
+      <!-- Shenzhen / Florida -->
+      <circle cx="380" cy="65" r="4" fill="#6B6B6B"/>
+      <line x1="380" y1="45" x2="380" y2="61" stroke="#6B6B6B" stroke-width="1" stroke-dasharray="2 2"/>
+      <text x="380" y="38" text-anchor="middle" font-family="Fraunces, serif" font-size="12" font-weight="600" fill="#6B6B6B">2024</text>
+      <text x="380" y="85" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="10" fill="#1A1A1A">Shenzhen · Florida</text>
+      <text x="380" y="98" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="8" fill="#6B6B6B">Primeras leyes</text>
+      <!-- Nuevo León -->
+      <circle cx="500" cy="65" r="6" fill="#1B4332"/>
+      <line x1="500" y1="42" x2="500" y2="59" stroke="#1B4332" stroke-width="1.5"/>
+      <text x="500" y="34" text-anchor="middle" font-family="Fraunces, serif" font-size="13" font-weight="700" fill="#1B4332">2026</text>
+      <text x="500" y="85" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="10" font-weight="600" fill="#1B4332">Nuevo León</text>
+      <text x="500" y="98" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="8" fill="#1B4332">Oportunidad</text>
+      <!-- Span arrow -->
+      <line x1="105" y1="112" x2="495" y2="112" stroke="#1B4332" stroke-width="1" opacity="0.3"/>
+      <polygon points="495,109 502,112 495,115" fill="#1B4332" opacity="0.3"/>
+      <text x="300" y="125" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="8" fill="#6B6B6B">21 años de ventana</text>
+    </svg>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <h2>Estado de la iniciativa</h2>
+
+  <p>La ley tiene 11 capítulos proyectados y aproximadamente 60 artículos. Este es el avance:</p>
+
+  <!-- Visual progress -->
+  <div class="progress-vis" aria-label="4 de 11 capítulos completados">
+    <svg viewBox="0 0 600 40" xmlns="http://www.w3.org/2000/svg" role="img">
+      <rect x="0" y="12" width="600" height="16" rx="2" fill="rgba(27,67,50,0.06)"/>
+      <rect x="0" y="12" width="218" height="16" rx="2" fill="#1B4332"/>
+      <rect x="218" y="12" width="110" height="16" fill="#8B6914" opacity="0.4"/>
+      <text x="109" y="24" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="9" font-weight="600" fill="#FAF8F4">4 listos</text>
+      <text x="273" y="24" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="9" font-weight="600" fill="#8B6914">2 en curso</text>
+      <text x="464" y="24" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="9" fill="#6B6B6B">5 pendientes</text>
+      <text x="600" y="8" text-anchor="end" font-family="Fraunces, serif" font-size="10" fill="#6B6B6B">11 capítulos</text>
+    </svg>
+  </div>
+
+  <ul class="stage-list">
+    <li><span class="stage-status done">Listo</span> Exposición de motivos y fundamento constitucional</li>
+    <li><span class="stage-status done">Listo</span> Capítulos de disposiciones generales y definiciones</li>
+    <li><span class="stage-status done">Listo</span> Capítulo de gobernanza y Consejo Estatal</li>
+    <li><span class="stage-status done">Listo</span> Capítulo de fomento e incentivos económicos</li>
+    <li><span class="stage-status wip">En curso</span> Capítulo de infraestructura y uso de suelo</li>
+    <li><span class="stage-status wip">En curso</span> Capítulo de formación de capital humano</li>
+    <li><span class="stage-status pending">Pendiente</span> Capítulo de seguridad y convivencia con comunidades</li>
+    <li><span class="stage-status pending">Pendiente</span> Capítulos de transitorios y régimen sancionatorio</li>
+    <li><span class="stage-status pending">Pendiente</span> Revisión jurídica integral y dictamen</li>
+  </ul>
+
+  <div class="closing">
+    <p>La ley está en redacción. Las decisiones que se tomen ahora definirán por una década si Nuevo León lidera o sigue.</p>
+    <div class="author">Documento de divulgación del proyecto. Raúl Gabino, mayo 2026.</div>
+  </div>
+
+</main>
+
+</body>
+</html>

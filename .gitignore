@@ -1,0 +1,8 @@
+.DS_Store
+Fotos/
+Video/
+.claude/
+*.csv
+*.txt
+viaje-lec-tam/
+README.md
