@@ -1,762 +1,1029 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ley de Economía de Baja Altitud — Nuevo León</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300;1,9..144,400&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Economía de baja altitud · Tamaulipas</title>
+  <meta name="description" content="Drones que revisan cultivos, inspeccionan puentes o llevan medicinas a la sierra. Una propuesta de ley para que Tamaulipas prepare el terreno a esta industria, sin invadir lo que le toca a la Federación.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://economia-baja-altitud.vercel.app/">
+  <meta property="og:title" content="Lo que vuela bajo también mueve la economía · Tamaulipas">
+  <meta property="og:description" content="Una propuesta de ley estatal de fomento a la economía de baja altitud. El cielo es federal; el suelo es de Tamaulipas.">
+  <meta property="og:image" content="https://economia-baja-altitud.vercel.app/img/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="es_MX">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#0a0a0c">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2372192C'/%3E%3Ccircle cx='16' cy='16' r='5' fill='%23FFD25A'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet"/>
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
-  --bone: #FAF8F4;
-  --ink: #1A1A1A;
-  --accent: #1B4332;
-  --accent-light: rgba(27, 67, 50, 0.08);
-  --grey: #6B6B6B;
-  --serif: 'Fraunces', Georgia, serif;
-  --sans: 'Inter Tight', -apple-system, sans-serif;
-}
+    :root {
+      --guinda:   #72192C;
+      --acento:   #A83050;
+      --verde:    #2A6049;
+      --dron:     #FFD25A;
+      --tinta:    #1A1A1A;
+      --fondo:    #F7F5F0;
+    }
 
-html {
-  font-size: 16px;
-  -webkit-text-size-adjust: 100%;
-}
+    html, body {
+      width: 100%;
+      overflow-x: hidden;
+      font-family: 'DM Sans', sans-serif;
+      background: #000;
+      color: #fff;
+      line-height: 1.6;
+      scroll-behavior: smooth;
+    }
 
-body {
-  background: var(--bone);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-weight: 400;
-  line-height: 1.6;
-  padding: 0;
-  margin: 0;
-}
+    /* ── MAPA FIJO ─────────────────────────────── */
+    #map {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      background: #050505;
+    }
+    .maplibregl-ctrl-attrib {
+      background: rgba(0,0,0,0.5) !important;
+      color: rgba(255,255,255,0.6) !important;
+      font-size: 9px !important;
+    }
+    .maplibregl-ctrl-attrib a { color: rgba(255,255,255,0.8) !important; }
+    .maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right { z-index: 4; }
 
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--bone);
-  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
-  padding: 6px 24px;
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--grey);
-}
+    /* Etiquetas de lugares sobre el mapa */
+    .place-label {
+      position: absolute;
+      pointer-events: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 10px;
+      font-weight: 600;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9), 0 0 12px rgba(0,0,0,0.5);
+      padding: 2px 7px 2px 6px;
+      background: rgba(114,25,44,0.88);
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.2);
+      transform: translate(12px, -50%);
+      opacity: 0;
+      transition: opacity .5s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .place-label::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--dron); box-shadow: 0 0 0 2px rgba(255,210,90,0.35);
+      margin-left: -20px; margin-right: 8px;
+    }
+    .place-label.on { opacity: 1; }
 
-main {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 48px 24px 96px;
-}
+    /* ── SCROLLY ───────────────────────────────── */
+    .scrolly { position: relative; z-index: 2; width: 100%; }
 
-/* — Altitude diagram — */
-.altitude-diagram {
-  margin: 0 -24px 48px;
-  overflow: hidden;
-}
+    /* ── PORTADA ───────────────────────────────── */
+    .hero-section {
+      position: relative;
+      min-height: 100svh;
+      width: 100%;
+      padding: clamp(24px, 5vw, 64px);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.78) 85%);
+    }
+    .hero-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 24px;
+    }
+    .hero-bar { width: 48px; height: 4px; background: var(--acento); margin-bottom: 32px; }
+    .hero-section h1 {
+      font-size: clamp(40px, 7.4vw, 100px);
+      font-weight: 300;
+      line-height: 0.95;
+      letter-spacing: -0.035em;
+      color: #fff;
+      margin-bottom: 28px;
+      max-width: 15ch;
+    }
+    .hero-section h1 strong { font-weight: 800; display: block; }
+    .hero-section > p {
+      font-size: clamp(15px, 1.6vw, 20px);
+      color: rgba(255,255,255,0.78);
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 44px;
+    }
+    .hero-stats {
+      display: flex;
+      gap: clamp(24px, 5vw, 64px);
+      flex-wrap: wrap;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      max-width: 820px;
+    }
+    .hs-num {
+      font-family: 'DM Mono', monospace;
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 500;
+      color: #fff;
+      line-height: 1;
+    }
+    .hs-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.55);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 6px;
+      max-width: 17ch;
+    }
+    .hero-byline { margin-top: 28px; font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 0.02em; }
+    .hero-byline b { color: rgba(255,255,255,0.8); font-weight: 600; }
+    .scroll-cue {
+      position: absolute;
+      bottom: clamp(24px, 5vw, 48px);
+      right: clamp(24px, 5vw, 48px);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+    }
+    .scroll-cue::after {
+      content: '';
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.4));
+      animation: cueSlide 2.2s ease-in-out infinite;
+    }
+    @keyframes cueSlide {
+      0%,100% { opacity: 0.3; transform: scaleY(0.6); }
+      50%     { opacity: 1;   transform: scaleY(1); }
+    }
 
-.altitude-diagram svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
+    /* ── CAPÍTULOS ─────────────────────────────── */
+    .chapter {
+      min-height: 100svh;
+      padding: clamp(24px, 5vw, 72px);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    .chapter.right { justify-content: flex-end; }
 
-h1 {
-  font-family: var(--serif);
-  font-weight: 300;
-  font-size: clamp(1.75rem, 5vw, 2.5rem);
-  line-height: 1.2;
-  margin-bottom: 24px;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-}
+    .chapter-card {
+      background: rgba(10, 10, 12, 0.84);
+      backdrop-filter: blur(16px) saturate(1.4);
+      -webkit-backdrop-filter: blur(16px) saturate(1.4);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: clamp(28px, 3vw, 44px);
+      max-width: 540px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .chapter-card.wide { max-width: 600px; }
+    .chapter-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      color: var(--acento);
+      letter-spacing: 0.12em;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .chapter-num::before { content: ''; width: 24px; height: 2px; background: var(--acento); }
+    .chapter-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 14px;
+    }
+    .chapter-loc {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--acento);
+      font-weight: 500;
+      margin: -6px 0 18px 0;
+      letter-spacing: 0.01em;
+    }
+    .chapter-card h2 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+    .chapter-card h2 strong { font-weight: 700; }
+    .chapter-card p {
+      font-size: clamp(14px, 1.25vw, 15.5px);
+      color: rgba(255,255,255,0.74);
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+    .chapter-card p:last-child { margin-bottom: 0; }
+    .chapter-stat {
+      padding: 16px 20px;
+      background: rgba(114,25,44,0.25);
+      border-left: 3px solid var(--guinda);
+      border-radius: 0 6px 6px 0;
+      margin-top: 22px;
+    }
+    .chapter-stat.acento { background: rgba(168,48,80,0.22); border-left-color: var(--acento); }
+    .chapter-stat.verde  { background: rgba(42,96,73,0.25); border-left-color: var(--verde); }
+    .cs-num {
+      font-family: 'DM Mono', monospace;
+      font-size: clamp(24px, 2.8vw, 30px);
+      font-weight: 500;
+      color: #fff;
+      line-height: 1;
+    }
+    .chapter-stat.acento .cs-num { color: #E0708F; }
+    .chapter-stat.verde  .cs-num { color: #7CC7A2; }
+    .cs-label {
+      font-size: 11px;
+      color: rgba(255,255,255,0.58);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 8px;
+    }
 
-.meta {
-  font-family: var(--sans);
-  font-size: 13px;
-  color: var(--grey);
-  margin-bottom: 56px;
-  line-height: 1.5;
-}
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--dron);
+      border: 1px solid rgba(255,210,90,0.35);
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin-bottom: 18px;
+    }
+    .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--dron); }
 
-.meta span {
-  display: inline-block;
-  margin-right: 16px;
-}
+    /* Imagen dentro de tarjeta */
+    .chapter-image {
+      width: 100%;
+      aspect-ratio: 2 / 1;
+      background-color: var(--guinda);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      display: block;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+    }
+    .chapter-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photo-cap { font-size: 11px; color: rgba(255,255,255,0.45); margin: 0 0 22px; line-height: 1.5; }
+    .photo-cap a { color: rgba(255,255,255,0.6); }
 
-h2 {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: clamp(1.25rem, 3.5vw, 1.6rem);
-  line-height: 1.25;
-  margin-top: 64px;
-  margin-bottom: 20px;
-  color: var(--ink);
-}
+    /* Federación / Estado */
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+    .split > div { padding: 16px 18px; border-radius: 0 6px 6px 0; }
+    .split .fed { background: rgba(255,255,255,0.06); border-left: 3px solid rgba(255,255,255,0.35); }
+    .split .est { background: rgba(168,48,80,0.2); border-left: 3px solid var(--acento); }
+    .split h3 { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; }
+    .split .fed h3 { color: rgba(255,255,255,0.7); }
+    .split .est h3 { color: #E0708F; }
+    .split ul { list-style: none; }
+    .split li { font-size: 13px; color: rgba(255,255,255,0.78); padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.06); line-height: 1.45; }
+    .split li:last-child { border-bottom: 0; }
 
-h3 {
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent);
-  margin-top: 40px;
-  margin-bottom: 12px;
-}
+    /* Cuatro herramientas */
+    .tools { list-style: none; margin-top: 6px; }
+    .tools li { display: grid; grid-template-columns: 34px 1fr; gap: 6px 10px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .tools li:last-child { border-bottom: 0; }
+    .tools span { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--acento); padding-top: 3px; }
+    .tools b { display: block; font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 2px; }
+    .tools em { font-style: normal; font-size: 13.5px; color: rgba(255,255,255,0.7); line-height: 1.55; }
+    .chapter-card .note { font-size: 12.5px; color: rgba(255,255,255,0.55); margin-top: 16px; }
 
-p {
-  margin-bottom: 20px;
-  font-size: 1rem;
-  line-height: 1.65;
-}
+    /* ── INDICADOR DE AVANCE ───────────────────── */
+    .progress-indicator {
+      position: fixed;
+      right: clamp(16px, 3vw, 32px);
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+    }
+    .progress-dot {
+      width: 8px; height: 8px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border: 1.5px solid transparent;
+      transition: all 0.4s;
+      cursor: pointer;
+    }
+    .progress-dot.active {
+      background: var(--acento);
+      box-shadow: 0 0 0 4px rgba(168,48,80,0.28);
+      width: 10px; height: 10px;
+    }
 
-.lead {
-  font-family: var(--serif);
-  font-size: clamp(1.1rem, 3vw, 1.3rem);
-  line-height: 1.5;
-  font-weight: 300;
-  margin-bottom: 32px;
-}
+    /* ── SECCIONES FINALES ─────────────────────── */
+    .closing-section {
+      position: relative;
+      z-index: 3;
+      min-height: 100svh;
+      padding: clamp(32px, 6vw, 96px);
+      background: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(10,10,12,0.97) 45%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .closing-section.solid { background: #0a0a0c; min-height: auto; }
+    .closing-section .tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--acento);
+      margin-bottom: 24px;
+    }
+    .closing-section h2 {
+      font-size: clamp(32px, 5vw, 60px);
+      font-weight: 300;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      color: #fff;
+      max-width: 900px;
+      margin-bottom: 16px;
+    }
+    .closing-section h2 em { font-style: normal; font-weight: 700; color: var(--acento); }
+    .closing-section .lead { font-size: 15px; color: rgba(255,255,255,0.6); max-width: 640px; margin-bottom: 36px; }
 
-/* — Pull quote — */
-.pull-quote {
-  margin: 48px 0;
-  padding: 0 0 0 24px;
-  border-left: 3px solid var(--accent);
-}
+    /* Preguntas desplegables (juego y preguntas frecuentes) */
+    .qa { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; max-width: 1100px; }
+    .qa details {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 10px;
+      transition: border-color .25s, background .25s;
+    }
+    .qa details[open] { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.18); }
+    .qa summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 48px 18px 20px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+      line-height: 1.45;
+      position: relative;
+    }
+    .qa summary::-webkit-details-marker { display: none; }
+    .qa summary::after {
+      content: '+';
+      position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+      font-family: 'DM Mono', monospace; font-size: 18px; color: var(--acento);
+      transition: transform .25s;
+    }
+    .qa details[open] summary::after { transform: translateY(-50%) rotate(45deg); }
+    .qa summary:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; border-radius: 10px; }
+    .qa .ans { padding: 0 20px 18px; font-size: 14px; color: rgba(255,255,255,0.72); line-height: 1.6; }
+    .who {
+      display: inline-block;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 3px; margin-bottom: 8px;
+    }
+    .who.fed  { background: rgba(255,255,255,0.14); color: #fff; }
+    .who.est  { background: rgba(168,48,80,0.35); color: #F3B7C7; }
+    .who.amb  { background: rgba(42,96,73,0.4); color: #A8E0C2; }
+    .qa.faq { grid-template-columns: 1fr; max-width: 820px; }
 
-.pull-quote p {
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: clamp(1.15rem, 3vw, 1.35rem);
-  line-height: 1.45;
-  color: var(--ink);
-  margin-bottom: 0;
-}
+    .closing-final { max-width: 820px; }
+    .closing-final .statement { font-size: clamp(22px, 3vw, 32px); font-weight: 300; line-height: 1.3; color: #fff; margin-bottom: 40px; letter-spacing: -0.01em; }
+    .signature { display: flex; flex-direction: column; gap: 4px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 28px; }
+    .signature b { font-size: 18px; font-weight: 600; }
+    .signature span { font-size: 13px; color: rgba(255,255,255,0.55); }
+    .disclaimer { font-size: 12px; color: rgba(255,255,255,0.42); margin-bottom: 24px; max-width: 680px; }
+    .sources summary { cursor: pointer; font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.7); padding: 8px 0; }
+    .sources summary:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+    .sources ol { margin: 12px 0 0 18px; }
+    .sources li { font-size: 12.5px; color: rgba(255,255,255,0.55); margin-bottom: 8px; line-height: 1.5; }
+    .sources a { color: rgba(255,255,255,0.75); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.2); word-break: break-word; }
+    .sources a:hover { color: #E0708F; border-bottom-color: #E0708F; }
+    .sources h4 { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin: 18px 0 6px; font-weight: 600; }
 
-/* — Section divider with mountain silhouette — */
-.section-divider {
-  width: 40px;
-  height: 2px;
-  background: var(--accent);
-  margin: 64px 0 48px;
-}
+    .footer {
+      position: relative;
+      z-index: 3;
+      padding: 24px clamp(24px, 5vw, 48px) 28px;
+      background: #0a0a0c;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 11px;
+      color: rgba(255,255,255,0.35);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
 
-.mountain-break {
-  margin: 64px -24px 48px;
-  text-align: center;
-  opacity: 0.12;
-}
-
-.mountain-break svg {
-  width: 100%;
-  max-width: 680px;
-  height: auto;
-}
-
-ol.editorial-list {
-  list-style: none;
-  counter-reset: item;
-  padding: 0;
-  margin-bottom: 24px;
-}
-
-ol.editorial-list li {
-  counter-increment: item;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(26, 26, 26, 0.06);
-  font-size: 1rem;
-  line-height: 1.55;
-  padding-left: 40px;
-  position: relative;
-}
-
-ol.editorial-list li::before {
-  content: counter(item);
-  position: absolute;
-  left: 0;
-  top: 12px;
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: var(--accent);
-}
-
-/* — Two columns — */
-.two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  margin: 32px 0;
-}
-
-@media (max-width: 520px) {
-  .two-col {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-}
-
-.two-col-header {
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent);
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--accent);
-}
-
-.two-col ul {
-  list-style: none;
-  padding: 0;
-}
-
-.two-col li {
-  font-size: 0.95rem;
-  line-height: 1.55;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(26, 26, 26, 0.05);
-}
-
-/* — Stats with bar visualization — */
-.stat-block {
-  margin: 40px 0;
-  padding: 0;
-}
-
-.stat-item {
-  margin-bottom: 44px;
-}
-
-.stat-number {
-  font-family: var(--serif);
-  font-weight: 700;
-  font-size: clamp(3rem, 12vw, 5rem);
-  line-height: 1;
-  color: var(--accent);
-  letter-spacing: -0.02em;
-}
-
-.stat-unit {
-  font-family: var(--serif);
-  font-weight: 300;
-  font-size: clamp(1.5rem, 5vw, 2rem);
-  color: var(--accent);
-}
-
-.stat-label {
-  font-family: var(--sans);
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--grey);
-  margin-top: 4px;
-}
-
-.stat-context {
-  font-size: 0.9rem;
-  color: var(--grey);
-  margin-top: 6px;
-  line-height: 1.5;
-}
-
-.stat-bar {
-  margin-top: 12px;
-  height: 6px;
-  background: var(--accent-light);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.stat-bar-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 3px;
-}
-
-/* — Sector benefits grid — */
-.benefit-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  margin: 32px 0;
-  border-top: 1px solid rgba(26, 26, 26, 0.1);
-  border-left: 1px solid rgba(26, 26, 26, 0.1);
-}
-
-@media (max-width: 480px) {
-  .benefit-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.benefit-cell {
-  padding: 24px 20px;
-  border-right: 1px solid rgba(26, 26, 26, 0.1);
-  border-bottom: 1px solid rgba(26, 26, 26, 0.1);
-}
-
-.benefit-cell-title {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1rem;
-  margin-bottom: 6px;
-}
-
-.benefit-cell-desc {
-  font-size: 0.88rem;
-  line-height: 1.5;
-  color: var(--grey);
-}
-
-.benefit-cell svg {
-  display: block;
-  margin-bottom: 12px;
-}
-
-/* — Comparison — */
-.comparison-block {
-  margin: 40px 0;
-}
-
-.comparison-item {
-  padding: 20px 0;
-  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
-}
-
-.comparison-item:first-child {
-  border-top: 1px solid rgba(26, 26, 26, 0.08);
-}
-
-.comparison-place {
-  font-family: var(--serif);
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 2px;
-}
-
-.comparison-year {
-  font-family: var(--sans);
-  font-size: 0.8rem;
-  color: var(--grey);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.comparison-desc {
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin-top: 6px;
-}
-
-.bar-chart {
-  margin: 32px 0;
-}
-
-.bar-chart svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* — Stage list — */
-.stage-list {
-  list-style: none;
-  padding: 0;
-  margin: 24px 0;
-}
-
-.stage-list li {
-  padding: 10px 0;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  border-bottom: 1px solid rgba(26, 26, 26, 0.05);
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-}
-
-.stage-status {
-  font-family: var(--sans);
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-  min-width: 72px;
-}
-
-.stage-status.done { color: var(--accent); }
-.stage-status.wip { color: #8B6914; }
-.stage-status.pending { color: var(--grey); }
-
-/* — Progress vis — */
-.progress-vis {
-  margin: 32px 0;
-}
-
-.progress-vis svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* — Closing — */
-.closing {
-  margin-top: 72px;
-  padding-top: 32px;
-  border-top: 2px solid var(--ink);
-}
-
-.closing p {
-  font-family: var(--serif);
-  font-weight: 400;
-  font-style: italic;
-  font-size: 1.1rem;
-  line-height: 1.5;
-}
-
-.author {
-  margin-top: 32px;
-  font-size: 0.85rem;
-  color: var(--grey);
-}
-
-strong { font-weight: 600; }
-em { font-style: italic; }
-
-@media (min-width: 768px) {
-  main {
-    padding: 72px 24px 120px;
-  }
-  .altitude-diagram {
-    margin-left: -60px;
-    margin-right: -60px;
-  }
-}
-</style>
+    /* ── CELULAR ───────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero-section h1 { font-size: clamp(34px, 11vw, 52px); }
+      .chapter { min-height: 140svh; padding: 16px 14px 28px; align-items: flex-end; }
+      .chapter-card { max-width: 100%; padding: 20px 18px; border-radius: 12px; }
+      .chapter-card h2 { font-size: 23px; margin-bottom: 14px; }
+      .chapter-card p { font-size: 14px; line-height: 1.55; margin-bottom: 12px; }
+      .chapter-image { aspect-ratio: 2.3 / 1; }
+      .photo-cap { font-size: 10.5px; margin-bottom: 14px; }
+      .chapter-stat { padding: 12px 16px; margin-top: 14px; }
+      .badge { margin-bottom: 12px; }
+      .split { grid-template-columns: 1fr; }
+      .progress-indicator { display: none; }
+      .scroll-cue { display: none; }
+      .place-label { font-size: 9px; }
+      .qa { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .scroll-cue::after { animation: none; }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="topbar" role="banner">Economía de baja altitud · Nuevo León</div>
+<div id="map" role="img" aria-label="Mapa satelital que acompaña la lectura y se mueve a cada lugar mencionado"></div>
+<div class="progress-indicator" id="progressIndicator" aria-hidden="true"></div>
 
-<main>
+<div class="scrolly">
 
-  <!-- Altitude zone diagram -->
-  <div class="altitude-diagram" aria-label="Diagrama de zona de baja altitud: 0 a 300 metros">
-    <svg viewBox="0 0 800 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Corte vertical del espacio aéreo bajo: terreno, zona de actividad de 0 a 300 metros, y cielo abierto">
-      <!-- Sky -->
-      <rect x="0" y="0" width="800" height="100" fill="#E8EDE9"/>
-      <!-- Low altitude zone -->
-      <rect x="0" y="100" width="800" height="80" fill="rgba(27,67,50,0.07)"/>
-      <!-- Ground -->
-      <path d="M0 180 Q100 165 200 172 Q300 178 400 170 Q500 162 600 175 Q700 180 800 168 L800 220 L0 220Z" fill="#D4CFC4"/>
-      <!-- Mountain silhouette -->
-      <path d="M0 180 L80 140 L130 160 L200 110 L260 145 L320 100 L380 135 L420 120 L480 155 L520 130 L580 150 L640 115 L700 148 L750 135 L800 160 L800 220 L0 220Z" fill="#B8B2A6" opacity="0.5"/>
-      <path d="M50 180 L150 150 L220 165 L300 125 L370 155 L430 140 L500 168 L560 145 L630 158 L700 138 L800 170 L800 220 L0 220Z" fill="#A39D91" opacity="0.4"/>
-      <!-- Labels -->
-      <text x="20" y="50" font-family="Inter Tight, sans-serif" font-size="9" fill="#6B6B6B" text-transform="uppercase" letter-spacing="1">Espacio aéreo controlado</text>
-      <text x="20" y="92" font-family="Inter Tight, sans-serif" font-size="9" fill="#1B4332" font-weight="600" letter-spacing="1">ZONA DE BAJA ALTITUD</text>
-      <!-- Altitude markers -->
-      <line x1="760" y1="100" x2="760" y2="180" stroke="#1B4332" stroke-width="1.5"/>
-      <line x1="753" y1="100" x2="767" y2="100" stroke="#1B4332" stroke-width="1.5"/>
-      <line x1="753" y1="180" x2="767" y2="180" stroke="#1B4332" stroke-width="1.5"/>
-      <text x="748" y="145" font-family="Fraunces, serif" font-size="14" font-weight="700" fill="#1B4332" text-anchor="end">300m</text>
-      <!-- Drone shapes (abstract) -->
-      <line x1="180" y1="130" x2="200" y2="130" stroke="#1B4332" stroke-width="1.5" opacity="0.5"/>
-      <line x1="190" y1="124" x2="190" y2="136" stroke="#1B4332" stroke-width="1.5" opacity="0.5"/>
-      <circle cx="190" cy="130" r="3" fill="#1B4332" opacity="0.4"/>
-      <line x1="480" y1="115" x2="500" y2="115" stroke="#1B4332" stroke-width="1.5" opacity="0.5"/>
-      <line x1="490" y1="109" x2="490" y2="121" stroke="#1B4332" stroke-width="1.5" opacity="0.5"/>
-      <circle cx="490" cy="115" r="3" fill="#1B4332" opacity="0.4"/>
-      <line x1="620" y1="140" x2="640" y2="140" stroke="#1B4332" stroke-width="1.5" opacity="0.35"/>
-      <line x1="630" y1="134" x2="630" y2="146" stroke="#1B4332" stroke-width="1.5" opacity="0.35"/>
-      <circle cx="630" cy="140" r="3" fill="#1B4332" opacity="0.3"/>
-    </svg>
-  </div>
+  <!-- PORTADA -->
+  <section class="hero-section" data-chapter="0" data-view="estado" data-labels="">
+    <p class="hero-tag">Propuesta de ley · Tamaulipas · 2026</p>
+    <div class="hero-bar"></div>
+    <h1>Lo que vuela bajo<strong>también mueve<br>la <span style="color:var(--acento)">economía</span>.</strong></h1>
+    <p>Drones que revisan cultivos, inspeccionan puentes o llevan medicinas a la sierra. Esta es una propuesta para que Tamaulipas prepare el terreno a esa industria, sin meterse en lo que le toca a la Federación.</p>
+    <div class="hero-stats">
+      <div><div class="hs-num">1,000 m</div><div class="hs-label">altura de referencia de la baja altitud</div></div>
+      <div><div class="hs-num">6</div><div class="hs-label">usos con los que podría empezar</div></div>
+      <div><div class="hs-num">4</div><div class="hs-label">herramientas que sí son del estado</div></div>
+      <div><div class="hs-num">0</div><div class="hs-label">permisos de vuelo a cargo del estado</div></div>
+    </div>
+    <p class="hero-byline">Una propuesta de <b>Raúl Gabino</b> · Ciudad Victoria</p>
+    <div class="scroll-cue">Desplaza para explorar</div>
+  </section>
 
-  <h1>Una ley para que Nuevo León use el espacio aéreo bajo —los primeros 300 metros— como motor de empleo, logística e innovación.</h1>
+  <!-- 01 QUÉ ES -->
+  <section class="chapter" data-chapter="1"
+           data-lat="23.7369" data-lng="-99.1413" data-zoom="13.2" data-pitch="58" data-bearing="-20" data-labels=""
+           data-title="Ciudad Victoria">
+    <div class="chapter-card">
+      <div class="chapter-num">01 / 11</div>
+      <span class="chapter-tag">El concepto</span>
+      <h2>Todo lo que pasa<br><strong>en los primeros mil metros.</strong></h2>
+      <div class="chapter-image"><img loading="lazy" width="1100" height="826" src="img/evtol_ehang.webp" alt="Aeronave eléctrica de pasajeros EHang 216-S sobre una plataforma de aterrizaje en una exhibición."></div>
+      <p class="photo-cap">Aeronave eléctrica para pasajeros EHang 216-S, exhibida en París en 2025. Foto: Artvill, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>.</p>
+      <p>En China le llaman <span lang="zh">低空经济</span>: economía de baja altitud. Agrupa las actividades que dependen de vuelos cerca del suelo: drones que reparten, fumigan, vigilan o inspeccionan y, en los próximos años, aeronaves eléctricas para pasajeros.</p>
+      <p>Pero la economía no está solo en el aire. También está en tierra: fabricantes, talleres, operadores, empresas de datos y escuelas que forman a la gente.</p>
+    </div>
+  </section>
 
-  <div class="meta">
-    <span>Mayo 2026</span>
-    <span>Iniciativa en formación</span>
-    <span>Raúl Gabino</span>
-  </div>
+  <!-- 02 SHENZHEN -->
+  <section class="chapter right" data-chapter="2"
+           data-lat="22.5431" data-lng="114.0579" data-zoom="11.6" data-pitch="38" data-bearing="0" data-labels="shenzhen"
+           data-title="Shenzhen, China">
+    <div class="chapter-card">
+      <div class="chapter-num">02 / 11</div>
+      <span class="chapter-tag">Esto ya está pasando</span>
+      <h2>En Shenzhen, el dron<br><strong>ya es un servicio diario.</strong></h2>
+      <div class="chapter-image"><img loading="lazy" width="1100" height="825" src="img/shenzhen_entrega.webp" alt="Casillero blanco para recibir entregas por dron en una plaza de Shenzhen."></div>
+      <p class="photo-cap">Casillero para entregas por dron en Longhua, Shenzhen, febrero de 2025. Foto: ALB 302 AOE woapsing, dominio público (CC0).</p>
+      <p>En febrero de 2024 entró en vigor en Shenzhen el primer reglamento de su tipo en China, dedicado a promover la economía de baja altitud. Al cierre de ese año, la ciudad tenía 250 rutas de baja altitud y 483 puntos de despegue y aterrizaje para drones.</p>
+      <p>Desde julio de 2026, la Ley de Aviación Civil de China tiene un capítulo dedicado a este sector. Estados Unidos y Europa lo regulan sobre todo como un asunto de seguridad aérea. China lo trata como industria.</p>
+      <div class="chapter-stat acento">
+        <div class="cs-num">778 mil</div>
+        <div class="cs-label">vuelos comerciales de carga con dron en Shenzhen durante 2024</div>
+      </div>
+    </div>
+  </section>
 
-  <p class="lead">La economía de baja altitud abarca todo lo que vuela por debajo de 300 metros con fines civiles: drones de carga, agricultura de precisión, inspección de infraestructura, monitoreo ambiental, transporte eléctrico vertical de pasajeros. Es un sector que ya generó regulación propia en China y Estados Unidos. México aún no tiene una ley estatal que lo reconozca.</p>
+  <!-- 03 LA IDEA CENTRAL -->
+  <section class="chapter" data-chapter="3" data-view="estado" data-labels=""
+           data-title="Tamaulipas">
+    <div class="chapter-card wide">
+      <div class="chapter-num">03 / 11</div>
+      <span class="chapter-tag">La idea central</span>
+      <h2>El cielo es federal.<br><strong>El suelo es de Tamaulipas.</strong></h2>
+      <p>En México, el espacio aéreo y todo lo relacionado con volar corresponde a la Federación, a través de la Agencia Federal de Aviación Civil (AFAC). Un estado no puede autorizar vuelos ni certificar drones.</p>
+      <p>Pero casi todo lo que hace crecer a esta industria ocurre en tierra, y ahí el estado sí tiene herramientas. Shenzhen hace lo mismo: su reglamento deja el vuelo a la autoridad nacional y se ocupa de lo demás.</p>
+      <div class="split">
+        <div class="fed">
+          <h3>Federación</h3>
+          <ul><li>Espacio aéreo</li><li>Permisos de vuelo</li><li>Registro de drones y pilotos</li><li>Certificación de aeronaves</li><li>Aeropuertos y helipuertos</li></ul>
+        </div>
+        <div class="est">
+          <h3>Estado</h3>
+          <ul><li>Uso de suelo y desarrollo urbano</li><li>Inversión e incentivos</li><li>Formación de talento</li><li>Proyectos piloto</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <p>Esta iniciativa de ley propone que Nuevo León sea el primer Estado en hacerlo.</p>
+  <!-- 04 CAMPO -->
+  <section class="chapter right" data-chapter="4"
+           data-lat="24.894" data-lng="-98.02" data-zoom="12.4" data-pitch="55" data-bearing="15" data-labels="campo" data-route="campo"
+           data-title="Valle de San Fernando">
+    <div class="chapter-card">
+      <div class="chapter-num">04 / 11</div>
+      <span class="chapter-tag">Un día en Tamaulipas · 06:30</span>
+      <div class="badge">Escena ilustrativa</div>
+      <h2>Un dron recorre el sorgo<br><strong>antes del calor.</strong></h2>
+      <div class="chapter-image"><img loading="lazy" width="1100" height="734" src="img/dron_agricola.webp" alt="Dron agrícola aplicando producto sobre un cultivo verde junto a una arboleda."></div>
+      <p class="photo-cap">Dron agrícola aplicando sobre un cultivo en la India. Foto: Shreesha Sharma, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.</p>
+      <p>Mide la salud del cultivo, ubica plagas como el pulgón amarillo y aplica producto solo donde hace falta. Así se gasta menos y el problema se detecta antes de que se extienda.</p>
+      <p>Tamaulipas es el primer productor de sorgo del país, y San Fernando es el municipio con más superficie sembrada.</p>
+      <div class="chapter-stat verde">
+        <div class="cs-num">216 mil ha</div>
+        <div class="cs-label">de sorgo sembradas en San Fernando (SIAP)</div>
+      </div>
+    </div>
+  </section>
 
-  <div class="section-divider"></div>
+  <!-- 05 FRONTERA -->
+  <section class="chapter" data-chapter="5"
+           data-lat="26.0955" data-lng="-98.2728" data-zoom="14.4" data-pitch="58" data-bearing="-25" data-labels="frontera" data-route="frontera"
+           data-title="Reynosa">
+    <div class="chapter-card">
+      <div class="chapter-num">05 / 11</div>
+      <span class="chapter-tag">Un día en Tamaulipas · 10:00</span>
+      <div class="badge">Escena ilustrativa</div>
+      <h2>Revisar un puente<br><strong>sin cerrar un carril.</strong></h2>
+      <div class="chapter-image"><img loading="lazy" width="960" height="640" src="img/inspeccion_puente.webp" alt="Vista aérea de un puente tomada desde un dron durante una inspección."></div>
+      <p class="photo-cap">Vista desde un dron durante la inspección de un puente en Italia. Foto: FedericaGaspari, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.</p>
+      <p>Un dron recorre la estructura de un puente internacional, una línea eléctrica o un ducto. Con miles de fotos se arma un modelo en 3D que muestra dónde hay grietas o corrosión. La inspección se hace sin andamios y sin detener el tráfico.</p>
+      <div class="chapter-stat">
+        <div class="cs-num">19</div>
+        <div class="cs-label">cruces fronterizos de Tamaulipas con Texas, según la Secretaría de Economía estatal</div>
+      </div>
+    </div>
+  </section>
 
-  <h2>¿Por qué ahora?</h2>
+  <!-- 06 MEDICINAS -->
+  <section class="chapter right" data-chapter="6"
+           data-lat="23.66" data-lng="-99.45" data-zoom="9.4" data-pitch="50" data-bearing="-15" data-labels="victoria,miquihuana" data-route="medicinas"
+           data-title="Ciudad Victoria · Miquihuana">
+    <div class="chapter-card">
+      <div class="chapter-num">06 / 11</div>
+      <span class="chapter-tag">Un día en Tamaulipas · 12:30</span>
+      <div class="badge">Escena ilustrativa</div>
+      <h2>La medicina<br><strong>llega a la sierra por aire.</strong></h2>
+      <div class="chapter-image"><img loading="lazy" width="1100" height="807" src="img/entrega_paquete.webp" alt="Dron de ala fija soltando un paquete con paracaídas en un cielo despejado."></div>
+      <p class="photo-cap">Un dron de Zipline suelta un paquete con paracaídas. Foto: Roksenhorn, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.</p>
+      <p>Un centro de salud en Miquihuana necesita un medicamento que no tiene. En lugar de esperar el siguiente viaje por carretera, un dron lo lleva desde Ciudad Victoria. De regreso trae muestras para el laboratorio.</p>
+      <p>Este tipo de servicio ya funciona en países como Ruanda, Ghana y Estados Unidos.</p>
+      <div class="chapter-stat">
+        <div class="cs-num">65 km</div>
+        <div class="cs-label">en línea recta entre Ciudad Victoria y Miquihuana</div>
+      </div>
+    </div>
+  </section>
 
-  <p>Cuatro hechos definen la ventana de oportunidad:</p>
+  <!-- 07 INCENDIOS -->
+  <section class="chapter" data-chapter="7"
+           data-lat="23.075" data-lng="-99.215" data-zoom="11.6" data-pitch="62" data-bearing="25" data-labels="cielo" data-route="incendio" data-hot="1"
+           data-title="Reserva de la Biosfera El Cielo">
+    <div class="chapter-card">
+      <div class="chapter-num">07 / 11</div>
+      <span class="chapter-tag">Un día en Tamaulipas · 16:00</span>
+      <div class="badge">Escena ilustrativa</div>
+      <h2>La cámara térmica<br><strong>ve el fuego antes que nadie.</strong></h2>
+      <div class="chapter-image"><img loading="lazy" width="1100" height="619" src="img/incendio_infrarrojo.webp" alt="Imagen térmica en colores de un incendio forestal: la línea de fuego aparece en naranja sobre fondo azul."></div>
+      <p class="photo-cap">Imagen térmica de un incendio forestal tomada con dron en Oregón, Estados Unidos. Foto: Bureau of Land Management, dominio público.</p>
+      <p>En temporada de incendios, un dron con cámara térmica patrulla la sierra. Si detecta un punto caliente, manda las coordenadas a protección civil, y la brigada sabe a dónde ir antes de subir.</p>
+    </div>
+  </section>
 
-  <p><strong>El sector ya existe y crece rápido.</strong> La agricultura con drones reduce entre 30% y 40% el uso de agroquímicos. La logística aérea de última milla opera comercialmente en Shenzhen desde 2024. Los vehículos eléctricos de despegue vertical (eVTOL) tienen fecha de certificación en Estados Unidos para 2025-2026.</p>
+  <!-- 08 COSTA -->
+  <section class="chapter right" data-chapter="8"
+           data-lat="23.79" data-lng="-97.765" data-zoom="11.4" data-pitch="50" data-bearing="10" data-labels="pesca" data-route="costa"
+           data-title="La Pesca, Soto la Marina">
+    <div class="chapter-card">
+      <div class="chapter-num">08 / 11</div>
+      <span class="chapter-tag">Un día en Tamaulipas · 19:00</span>
+      <div class="badge">Escena ilustrativa</div>
+      <h2>Después del huracán,<br><strong>un mapa de daños el mismo día.</strong></h2>
+      <p>Tras un ciclón, los drones sobrevuelan la costa, ubican caminos cortados y viviendas dañadas y ayudan a decidir a dónde mandar primero la ayuda.</p>
+      <p>El resto del año, el mismo equipo sirve para vigilar playas y manglares o para recorridos turísticos, siempre con permiso federal.</p>
+    </div>
+  </section>
 
-  <p><strong>Otros ya legislaron.</strong> Shenzhen publicó la primera ordenanza del mundo sobre economía de baja altitud el 1 de febrero de 2024. China declaró ese año como "año inaugural" del sector. La FAA Reauthorization Act de 2024 regula "Advanced Air Mobility" en EE.&nbsp;UU. Europa tiene el paquete U-space.</p>
-
-  <p><strong>México no tiene ley estatal.</strong> La regulación aeronáutica federal (AFAC) se ocupa de seguridad operacional. Pero el fomento económico, la formación de talento, los estímulos fiscales locales y la reserva de suelo son competencia de los estados. Esa pieza falta.</p>
-
-  <div class="pull-quote">
-    <p>Sin marco estatal, la inversión no aterriza, el talento se va, el sector no crece.</p>
-  </div>
-
-  <p><strong>Nuevo León tiene condiciones para liderar.</strong> Es la economía industrial más grande del norte de México. Tiene frontera con Texas, un ecosistema de manufactura avanzada consolidado, universidades de primer nivel, la zona metropolitana de Monterrey con más de 5 millones de habitantes y una orografía de sierra que demanda soluciones aéreas para monitoreo y emergencias.</p>
-
-  <!-- Mountain silhouette break -->
-  <div class="mountain-break" aria-hidden="true">
-    <svg viewBox="0 0 800 60" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0 60 L40 35 L100 45 L160 20 L220 40 L280 15 L340 38 L380 8 L420 30 L460 22 L520 42 L560 18 L620 35 L680 12 L740 32 L800 25 L800 60Z" fill="#1A1A1A"/>
-    </svg>
-  </div>
-
-  <h2>Qué hace la ley</h2>
-
-  <p>Cinco acciones concretas:</p>
-
-  <ol class="editorial-list">
-    <li><strong>Reconoce a la economía de baja altitud como sector estratégico del Estado.</strong> Esto no es simbólico: habilita presupuesto, programas y criterios para la toma de decisiones sectoriales.</li>
-    <li><strong>Crea un Consejo Estatal tripartito</strong> —gobierno, academia, sector privado— que define prioridades, asigna recursos y evalúa resultados.</li>
-    <li><strong>Activa estímulos fiscales locales</strong> para empresas que inviertan en el sector: reducciones en impuesto sobre nómina, derechos de registro o cuotas de licencia, según diseñe el Ejecutivo.</li>
-    <li><strong>Reserva suelo apto</strong> en los programas de desarrollo urbano municipal para vertipuertos, centros de operación de drones e infraestructura terrestre del sector.</li>
-    <li><strong>Crea un Programa Estatal de Formación de Capital Humano</strong> para los empleos que el sector necesita: pilotos de drones certificados, técnicos en mantenimiento, desarrolladores de software de navegación, operadores logísticos.</li>
-  </ol>
-
-  <div class="section-divider"></div>
-
-  <h2>Qué no hace la ley</h2>
-
-  <p>Esto es tan importante como lo anterior. La iniciativa respeta la distribución constitucional de competencias. No invade lo federal.</p>
-
-  <div class="two-col">
-    <div>
-      <div class="two-col-header">Lo que regula el Estado</div>
-      <ul>
-        <li>Fomento económico y estímulos fiscales</li>
-        <li>Formación de capital humano</li>
-        <li>Reserva y uso de suelo</li>
-        <li>Política industrial y clústeres</li>
-        <li>Gobernanza y coordinación sectorial</li>
+  <!-- 09 QUÉ HARÍA LA LEY -->
+  <section class="chapter" data-chapter="9" data-view="estado" data-labels="campo,frontera,victoria,miquihuana,cielo,pesca"
+           data-title="Lo que haría la ley">
+    <div class="chapter-card wide">
+      <div class="chapter-num">09 / 11</div>
+      <span class="chapter-tag">La propuesta</span>
+      <h2>Cuatro herramientas<br><strong>que sí son del estado.</strong></h2>
+      <ul class="tools">
+        <li><span>01</span><div><b>Atraer inversión</b><em>Declarar el sector como estratégico y ofrecer incentivos estatales a fabricantes, talleres, operadores y empresas de datos.</em></div></li>
+        <li><span>02</span><div><b>Preparar el suelo</b><em>Que los planes urbanos señalen dónde pueden instalarse centros de operación, talleres y parques tecnológicos.</em></div></li>
+        <li><span>03</span><div><b>Formar talento</b><em>Carreras, becas y certificaciones con universidades y tecnológicos del estado. La licencia de piloto la sigue dando la AFAC.</em></div></li>
+        <li><span>04</span><div><b>Arrancar proyectos piloto</b><em>En salud, protección civil e inspección de obra pública, en coordinación con la autoridad federal.</em></div></li>
       </ul>
+      <p class="note">La propuesta contempla también un consejo estatal con gobierno, empresas y universidades para dar seguimiento.</p>
     </div>
-    <div>
-      <div class="two-col-header">Lo que sigue siendo federal</div>
-      <ul>
-        <li>Regulación del vuelo (AFAC)</li>
-        <li>Certificación de aeronaves</li>
-        <li>Licencias de pilotos</li>
-        <li>Normas técnicas aeronáuticas</li>
-        <li>Gestión del espacio aéreo</li>
-      </ul>
+  </section>
+
+  <!-- 10 QUERÉTARO -->
+  <section class="chapter right" data-chapter="10"
+           data-lat="20.6173" data-lng="-100.1856" data-zoom="12.6" data-pitch="40" data-bearing="0" data-labels="queretaro"
+           data-title="Querétaro">
+    <div class="chapter-card">
+      <div class="chapter-num">10 / 11</div>
+      <span class="chapter-tag">México ya lo hizo una vez</span>
+      <h2>Querétaro construyó<br><strong>una industria desde cero.</strong></h2>
+      <p>La primera empresa aeronáutica llegó a Querétaro en 1998. Hoy operan ahí más de 80 empresas del sector, entre ellas Safran, Bombardier, Airbus y GE Aerospace.</p>
+      <p>El estado lo logró con parques industriales, una universidad aeronáutica y promoción, sin regular el vuelo. Una ley de fomento le daría a Tamaulipas una ruta parecida, con reglas claras desde el inicio, en un sector que apenas empieza.</p>
+      <div class="chapter-stat acento">
+        <div class="cs-num">80+</div>
+        <div class="cs-label">empresas aeroespaciales en Querétaro</div>
+      </div>
     </div>
+  </section>
+
+  <!-- 11 EN QUÉ VA -->
+  <section class="chapter" data-chapter="11" data-view="estado" data-labels=""
+           data-title="Estado de la propuesta">
+    <div class="chapter-card">
+      <div class="chapter-num">11 / 11</div>
+      <span class="chapter-tag">En qué va</span>
+      <h2>La propuesta<br><strong>está en redacción.</strong></h2>
+      <p>Ya están escritos los dos primeros capítulos: qué regula la ley, qué significan sus términos, la cláusula que reconoce que el vuelo es federal y el reparto de tareas entre el estado y los municipios.</p>
+      <p>Faltan, entre otros, los capítulos de incentivos, suelo, formación, proyectos piloto y datos, además de una estimación de costos. El siguiente paso es revisarla con las dependencias estatales y con quienes trabajan en el sector.</p>
+      <div class="chapter-stat">
+        <div class="cs-num">2 de 11</div>
+        <div class="cs-label">capítulos redactados</div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /.scrolly -->
+
+<!-- ¿QUIÉN DECIDE QUÉ? -->
+<section class="closing-section" data-chapter="12" data-view="estado" data-labels="" data-pitch="0">
+  <p class="tag">Pon a prueba la idea</p>
+  <h2>¿Quién decide <em>qué</em>?</h2>
+  <p class="lead">Toca cada pregunta para ver la respuesta.</p>
+  <div class="qa">
+    <details><summary>¿Quién da permiso para volar un dron?</summary><div class="ans"><span class="who fed">Federación</span><br>La AFAC autoriza las operaciones y lleva el registro de drones y pilotos.</div></details>
+    <details><summary>¿Quién fija a qué altura puede volar?</summary><div class="ans"><span class="who fed">Federación</span><br>Las alturas máximas y las zonas restringidas son reglas federales.</div></details>
+    <details><summary>¿Quién decide en qué zona de la ciudad puede instalarse un taller de drones?</summary><div class="ans"><span class="who est">Estado y municipio</span><br>Con los planes de desarrollo urbano. Si ahí se despega o aterriza, también hace falta autorización federal.</div></details>
+    <details><summary>¿Quién puede dar incentivos a una empresa del sector?</summary><div class="ans"><span class="who est">Estado</span><br>Puede reducir impuestos y derechos estatales, como el impuesto sobre nóminas.</div></details>
+    <details><summary>¿Quién puede abrir una carrera o un programa de becas?</summary><div class="ans"><span class="who est">Estado</span><br>Con sus universidades y tecnológicos. La licencia de piloto sigue siendo federal.</div></details>
+    <details><summary>¿Quién certifica que un dron es seguro?</summary><div class="ans"><span class="who fed">Federación</span><br>La certificación de aeronaves es materia federal.</div></details>
+    <details><summary>¿Quién puede usar drones en protección civil?</summary><div class="ans"><span class="who amb">Los dos</span><br>El estado decide usarlos y opera el programa. Cada vuelo cumple las reglas federales.</div></details>
   </div>
+</section>
 
-  <p>La ley no certifica drones, no emite permisos de vuelo, no invade el espacio aéreo. Regula lo que rodea al vuelo por abajo: el ecosistema económico que lo hace posible.</p>
-
-  <!-- Mountain break -->
-  <div class="mountain-break" aria-hidden="true">
-    <svg viewBox="0 0 800 50" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0 50 L60 30 L140 40 L200 15 L280 35 L340 10 L400 28 L460 20 L540 38 L600 14 L680 30 L740 22 L800 35 L800 50Z" fill="#1A1A1A"/>
-    </svg>
+<!-- PREGUNTAS FRECUENTES -->
+<section class="closing-section solid">
+  <p class="tag">Preguntas frecuentes</p>
+  <h2>Lo que suele <em>preguntarse</em>.</h2>
+  <p class="lead">Respuestas cortas a las dudas más comunes.</p>
+  <div class="qa faq">
+    <details><summary>¿Va a haber drones volando sobre mi casa?</summary><div class="ans">La ley no autoriza vuelos. Los drones ya vuelan hoy bajo reglas federales que fijan alturas máximas y zonas restringidas. La ley estatal no cambia esas reglas.</div></details>
+    <details><summary>¿El estado va a dar permisos de vuelo?</summary><div class="ans">No. Ni permisos, ni licencias, ni registro de drones. La propuesta lo dice de forma expresa en su artículo 4, y en caso de conflicto manda la ley federal.</div></details>
+    <details><summary>¿Por qué una ley y no solo un programa de gobierno?</summary><div class="ans">Un programa depende de cada administración. Una ley da certeza a quien invierte a varios años y obliga a las dependencias a coordinarse.</div></details>
+    <details><summary>¿Cuánto costaría?</summary><div class="ans">Todavía no hay una estimación. Es uno de los pasos pendientes, junto con el análisis de impacto regulatorio.</div></details>
+    <details><summary>¿Por qué Tamaulipas?</summary><div class="ans">Tiene frontera con Texas, mucho campo, costa expuesta a ciclones, sierra con riesgo de incendios y un puerto industrial. En esos usos, estos servicios ya han probado ser útiles en otros lugares.</div></details>
   </div>
+</section>
 
-  <h2>Beneficios concretos</h2>
-
-  <div class="stat-block">
-    <div class="stat-item">
-      <div class="stat-number">80<span class="stat-unit">+</span></div>
-      <div class="stat-label">Empresas aeroespaciales en Querétaro</div>
-      <div class="stat-bar"><div class="stat-bar-fill" style="width: 80%"></div></div>
-      <div class="stat-context">Instaladas en menos de dos décadas, sin ley específica de fomento. El precedente existe; con marco legal, esperamos mayor velocidad.</div>
+<!-- CIERRE Y FIRMA -->
+<section class="closing-section solid">
+  <div class="closing-final">
+    <p class="tag">Para cerrar</p>
+    <p class="statement">El sector apenas empieza en México. Los estados que pongan reglas claras primero tendrán ventaja para atraerlo.</p>
+    <div class="signature">
+      <b>Raúl Gabino</b>
+      <span>Consultor en movilidad urbana y diseño regulatorio · Ciudad Victoria, Tamaulipas</span>
     </div>
-
-    <div class="stat-item">
-      <div class="stat-number">8,000<span class="stat-unit">+</span></div>
-      <div class="stat-label">Empleos especializados creados en ese clúster</div>
-      <div class="stat-bar"><div class="stat-bar-fill" style="width: 65%"></div></div>
-      <div class="stat-context">Querétaro operó con programas, parque industrial y universidad. Nuevo León puede partir con una estructura legal desde el inicio.</div>
-    </div>
-
-    <div class="stat-item">
-      <div class="stat-number">30–40<span class="stat-unit">%</span></div>
-      <div class="stat-label">Reducción en uso de agroquímicos con drones</div>
-      <div class="stat-bar"><div class="stat-bar-fill" style="width: 37%"></div></div>
-      <div class="stat-context">La región citrícola de Nuevo León —Montemorelos, Allende, General Terán— tiene mercado inmediato para precisión aérea.</div>
-    </div>
-
-    <div class="stat-item">
-      <div class="stat-number">5.3<span class="stat-unit">M</span></div>
-      <div class="stat-label">Habitantes en la zona metropolitana de Monterrey</div>
-      <div class="stat-bar"><div class="stat-bar-fill" style="width: 90%"></div></div>
-      <div class="stat-context">La tercera zona metropolitana más grande de México. La logística aérea de última milla tiene aquí escala suficiente para operar.</div>
-    </div>
+    <p class="disclaimer">Documento de divulgación de una propuesta en elaboración. No es un documento oficial del Gobierno del Estado de Tamaulipas. Las escenas marcadas como ilustrativas muestran usos posibles, no servicios que operen hoy en el estado.</p>
+    <details class="sources">
+      <summary>Fuentes y créditos</summary>
+      <h4>Datos</h4>
+      <ol>
+        <li>Reglamento de la Zona Económica Especial de Shenzhen sobre Promoción de la Economía de Baja Altitud, vigente desde el 1 de febrero de 2024. <a href="https://sf.sz.gov.cn/fggzywyb/content/post_12080142.html" target="_blank" rel="noopener">Buró de Justicia de Shenzhen</a>.</li>
+        <li>Rutas, puntos de despegue y vuelos de carga en Shenzhen al cierre de 2024. <a href="https://www.eyeshenzhen.com/content/2025-05/26/content_31580349.htm" target="_blank" rel="noopener">Eye Shenzhen, mayo de 2025</a>.</li>
+        <li>Entrada en vigor de la Ley de Aviación Civil reformada de China (1 de julio de 2026) y su capítulo sobre economía de baja altitud. <a href="https://www.chinadailyhk.com/article/638587" target="_blank" rel="noopener">China Daily, agosto de 2026</a>.</li>
+        <li>Tamaulipas, primer lugar nacional en sorgo grano, y superficie sembrada en San Fernando. <a href="https://www.gob.mx/cms/uploads/attachment/file/873726/Panorama_FA_2023_TAMPS.pdf" target="_blank" rel="noopener">SIAP, Panorama Agroalimentario Tamaulipas 2023</a>.</li>
+        <li>Diecinueve cruces fronterizos de Tamaulipas. <a href="https://thelogisticsworld.com/comercio-internacional/se-estan-ampliando-y-modernizando-3-puentes-para-el-comercio-exterior-en-nuevo-laredo-y-reynosa/" target="_blank" rel="noopener">The Logistics World, julio de 2026</a>.</li>
+        <li>Más de 80 empresas aeroespaciales en Querétaro. <a href="https://www.adn40.mx/mexico/2026-04-21/ni-corregidora-ni-el-marques-el-municipio-de-queretaro-donde-se-inauguro-una-celda-de-produccion-aeroespacial/" target="_blank" rel="noopener">ADN40, abril de 2026</a>. Principales empresas: <a href="https://mexicoindustry.com/noticia/las-industrias-que-definen-el-perfil-productivo-de-queretaro" target="_blank" rel="noopener">Mexico Industry</a>. Llegada de ITP Aero en 1998: <a href="https://clusterindustrial.com.mx/queretaro-promueve-su-industria-aeroespacial-en-farnborough-y-consolida-inversiones-con-itp-aero/" target="_blank" rel="noopener">Cluster Industrial</a>.</li>
+        <li>Marco federal: <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/25_180618.pdf" target="_blank" rel="noopener">Ley de Aviación Civil</a> y NOM-107-SCT3-2019 sobre aeronaves pilotadas a distancia.</li>
+      </ol>
+      <h4>Fotografías (Wikimedia Commons)</h4>
+      <ol>
+        <li><a href="https://commons.wikimedia.org/wiki/File:EHang_216-S_au_Salon_du_Bourget_2025.jpg" target="_blank" rel="noopener">EHang 216-S au Salon du Bourget 2025</a>, Artvill, CC BY 4.0.</li>
+        <li><a href="https://commons.wikimedia.org/wiki/File:SZ_%E6%B7%B1%E5%9C%B3_Shenzhen_%E9%BE%8D%E8%8F%AF_Longhua_%E9%A8%B0%E9%BE%8D%E8%B7%AF_Tenglong_Road_%E4%B8%AD%E6%A2%85%E8%B7%AF_Zhongmei_Road_white_%E4%BD%8E%E7%A9%BA%E7%B6%93%E6%BF%9F_%E7%84%A1%E4%BA%BA%E6%A9%9F_%E5%A4%96%E8%B3%A3%E9%A3%9F%E5%93%81_%E9%80%9F%E9%80%81%E6%94%B6%E8%B2%A8%E5%B9%B3%E5%8F%B0_February_2025_R12S_02.jpg" target="_blank" rel="noopener">Longhua, Shenzhen, febrero de 2025</a>, ALB 302 AOE woapsing, CC0. Recortada.</li>
+        <li><a href="https://commons.wikimedia.org/wiki/File:Agricultural_drone_spraying_on_paddy_field.jpg" target="_blank" rel="noopener">Agricultural drone spraying on paddy field</a>, Shreesha Sharma, CC BY-SA 4.0.</li>
+        <li><a href="https://commons.wikimedia.org/wiki/File:Drone_view_of_a_bridge_during_an_inspection.jpg" target="_blank" rel="noopener">Drone view of a bridge during an inspection</a>, FedericaGaspari, CC BY-SA 4.0.</li>
+        <li><a href="https://commons.wikimedia.org/wiki/File:Zipline-package-drop.jpg" target="_blank" rel="noopener">Zipline package drop</a>, Roksenhorn, CC BY-SA 4.0.</li>
+        <li><a href="https://commons.wikimedia.org/wiki/File:Drone_reconnaissance_during_wildfire_season_(39411577714).jpg" target="_blank" rel="noopener">Drone reconnaissance during wildfire season</a>, Bureau of Land Management Oregon and Washington, dominio público.</li>
+      </ol>
+      <h4>Mapa</h4>
+      <ol>
+        <li>Imagen satelital: Esri, Maxar. Límite estatal: Natural Earth, dominio público. Las rutas de dron son ilustrativas.</li>
+      </ol>
+    </details>
   </div>
+</section>
 
-  <h3>Otros beneficios sectoriales</h3>
+<footer class="footer">
+  <span>Economía de baja altitud · Tamaulipas · Noviembre de 2026</span>
+  <span>Imagen satelital: Esri, Maxar · Límite estatal: Natural Earth · Fotos: Wikimedia Commons</span>
+</footer>
 
-  <div class="benefit-grid">
-    <div class="benefit-cell">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M16 4L20 12L28 14L22 20L23 28L16 24L9 28L10 20L4 14L12 12Z" stroke="#1B4332" stroke-width="1.5" fill="none"/>
-      </svg>
-      <div class="benefit-cell-title">Emergencias</div>
-      <div class="benefit-cell-desc">Incendios en la Sierra Madre, deslaves tras lluvias atípicas, búsqueda y rescate en cañones de difícil acceso.</div>
-    </div>
-    <div class="benefit-cell">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="6" y="14" width="20" height="12" rx="2" stroke="#1B4332" stroke-width="1.5"/>
-        <path d="M6 18H26" stroke="#1B4332" stroke-width="1.5"/>
-        <path d="M13 6L16 14L19 6" stroke="#1B4332" stroke-width="1.5" fill="none"/>
-      </svg>
-      <div class="benefit-cell-title">Inspección industrial</div>
-      <div class="benefit-cell-desc">Plantas siderúrgicas, cementeras, automotrices. Monitoreo de infraestructura sin detener operaciones.</div>
-    </div>
-    <div class="benefit-cell">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="16" cy="16" r="10" stroke="#1B4332" stroke-width="1.5"/>
-        <path d="M16 6V16L22 22" stroke="#1B4332" stroke-width="1.5"/>
-      </svg>
-      <div class="benefit-cell-title">Logística fronteriza</div>
-      <div class="benefit-cell-desc">Inventarios, inspección de carga, distribución de última milla en el corredor Monterrey-Laredo.</div>
-    </div>
-    <div class="benefit-cell">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M4 28L10 16L16 20L22 10L28 14" stroke="#1B4332" stroke-width="1.5" fill="none"/>
-        <circle cx="10" cy="16" r="2" fill="#1B4332"/>
-        <circle cx="22" cy="10" r="2" fill="#1B4332"/>
-      </svg>
-      <div class="benefit-cell-title">Turismo aéreo</div>
-      <div class="benefit-cell-desc">Cumbres de Monterrey, Cañón de la Huasteca, Cola de Caballo. Experiencias que no requieren aeropuerto.</div>
-    </div>
-    <div class="benefit-cell">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M8 28V12L16 4L24 12V28" stroke="#1B4332" stroke-width="1.5" fill="none"/>
-        <rect x="13" y="18" width="6" height="10" stroke="#1B4332" stroke-width="1.5"/>
-      </svg>
-      <div class="benefit-cell-title">Obra pública</div>
-      <div class="benefit-cell-desc">Monitoreo de avance en proyectos de infraestructura metropolitana con drones de precisión.</div>
-    </div>
-    <div class="benefit-cell">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M6 24Q10 16 16 16Q22 16 26 24" stroke="#1B4332" stroke-width="1.5" fill="none"/>
-        <path d="M6 20Q10 12 16 12Q22 12 26 20" stroke="#1B4332" stroke-width="1.5" fill="none" opacity="0.5"/>
-        <path d="M6 16Q10 8 16 8Q22 8 26 16" stroke="#1B4332" stroke-width="1.5" fill="none" opacity="0.25"/>
-      </svg>
-      <div class="benefit-cell-title">Agricultura de precisión</div>
-      <div class="benefit-cell-desc">Cítricos, nuez, ganadería. Reducción en agroquímicos y optimización de riego en la región sur del Estado.</div>
-    </div>
-  </div>
+<script>
+/* ──── DATOS ────
+   Contorno de Tamaulipas: Natural Earth (dominio público), simplificado.
+   Rutas de dron: ilustrativas. */
+const TAM = [[-99.7107,27.6701],[-99.7004,27.6592],[-99.6647,27.6594],[-99.6449,27.6327],[-99.6002,27.6464],[-99.5902,27.6421],[-99.5782,27.6228],[-99.535,27.6048],[-99.5072,27.5738],[-99.5095,27.5],[-99.4804,27.4908],[-99.4729,27.4266],[-99.4976,27.3388],[-99.5214,27.3113],[-99.4866,27.2976],[-99.4804,27.2833],[-99.4518,27.2612],[-99.432,27.2076],[-99.4525,27.125],[-99.4394,27.0983],[-99.4617,27.057],[-99.4246,27.0179],[-99.3993,27.0127],[-99.3862,26.9622],[-99.337,26.9248],[-99.2483,26.8271],[-99.1811,26.6299],[-99.1649,26.5404],[-99.1151,26.5256],[-99.103,26.5121],[-99.0894,26.4712],[-99.1089,26.4343],[-99.1064,26.423],[-99.0855,26.4076],[-99.0279,26.4062],[-99.0105,26.3926],[-98.9628,26.3995],[-98.9454,26.3783],[-98.9299,26.3922],[-98.893,26.3678],[-98.8702,26.3721],[-98.8508,26.3641],[-98.8361,26.3721],[-98.825,26.3665],[-98.8013,26.3721],[-98.7464,26.3321],[-98.7359,26.32],[-98.7399,26.3033],[-98.7014,26.2991],[-98.6915,26.2902],[-98.7022,26.2716],[-98.6853,26.2685],[-98.6537,26.2443],[-98.6406,26.2418],[-98.5816,26.2623],[-98.4929,26.2306],[-98.4724,26.2077],[-98.4565,26.2259],[-98.4288,26.2177],[-98.3693,26.194],[-98.3773,26.1636],[-98.3393,26.1599],[-98.3004,26.1114],[-98.1851,26.0652],[-98.1502,26.0637],[-98.1031,26.0749],[-98.0833,26.0709],[-98.0751,26.0466],[-98.0655,26.0422],[-98.0131,26.0637],[-97.9417,26.0568],[-97.802,26.0637],[-97.7823,26.0586],[-97.7803,26.0432],[-97.7669,26.0397],[-97.6599,26.0307],[-97.6226,26.0091],[-97.5943,25.9664],[-97.5652,25.9547],[-97.5203,25.9128],[-97.4863,25.8957],[-97.4483,25.8923],[-97.4254,25.8549],[-97.4042,25.8514],[-97.3978,25.8658],[-97.3899,25.8657],[-97.376,25.8467],[-97.3457,25.8522],[-97.3511,25.9184],[-97.3284,25.9333],[-97.311,25.9221],[-97.2876,25.9287],[-97.2692,25.9444],[-97.2664,25.9606],[-97.1393,25.9658],[-97.1675,25.8286],[-97.1573,25.7895],[-97.1652,25.7233],[-97.1863,25.687],[-97.2615,25.4995],[-97.3194,25.39],[-97.459,25.1794],[-97.6514,24.5159],[-97.7167,24.0081],[-97.7252,23.8056],[-97.7333,23.7884],[-97.751,23.7819],[-97.8221,23.7884],[-97.8221,23.7822],[-97.7729,23.7801],[-97.7589,23.769],[-97.7538,23.7437],[-97.7606,23.6519],[-97.7538,23.6519],[-97.7469,23.6791],[-97.7333,23.7748],[-97.7222,23.7393],[-97.7581,23.4404],[-97.7685,23.2601],[-97.7423,22.9721],[-97.7538,22.8493],[-97.7539,22.9232],[-97.7645,22.912],[-97.7948,22.8083],[-97.8358,22.7612],[-97.8382,22.7397],[-97.85,22.7324],[-97.8767,22.7394],[-97.8574,22.7186],[-97.8551,22.6986],[-97.8932,22.6103],[-97.882,22.5879],[-97.8584,22.5935],[-97.85,22.6029],[-97.85,22.6575],[-97.8343,22.6697],[-97.8301,22.6164],[-97.85,22.5346],[-97.8201,22.4333],[-97.8221,22.4043],[-97.8091,22.3403],[-97.7819,22.2733],[-97.8349,22.2413],[-97.8518,22.2203],[-97.8628,22.2198],[-97.9128,22.2674],[-97.9138,22.2825],[-97.8952,22.3076],[-97.9086,22.3191],[-97.963,22.3495],[-98.0928,22.3726],[-98.1619,22.4278],[-98.1785,22.4733],[-98.1977,22.4805],[-98.2497,22.4589],[-98.2898,22.4668],[-98.2977,22.4066],[-98.3094,22.3995],[-98.3484,22.4085],[-98.3637,22.4009],[-98.3782,22.4269],[-98.4023,22.4125],[-98.4392,22.4327],[-98.4524,22.4237],[-98.4664,22.4343],[-98.5136,22.4353],[-98.6162,22.4186],[-98.6563,22.4429],[-98.6739,22.4206],[-98.7653,22.4057],[-98.8124,22.3625],[-98.8309,22.3584],[-98.9394,22.3723],[-99.1015,22.4208],[-99.2065,22.438],[-99.2484,22.4589],[-99.2652,22.4783],[-99.3152,22.5797],[-99.3792,22.6834],[-99.4171,22.6393],[-99.4317,22.6355],[-99.4489,22.6458],[-99.5073,22.7121],[-99.5299,22.728],[-99.5478,22.7283],[-99.5303,22.6659],[-99.5277,22.6255],[-99.5368,22.6175],[-99.5545,22.621],[-100.0001,22.7834],[-100.011,22.8203],[-100.0398,22.8683],[-100.0237,22.8934],[-99.9334,22.9352],[-99.9158,22.9574],[-99.9076,22.9841],[-99.9147,23.0178],[-99.9987,23.1104],[-100.0063,23.1653],[-100.0221,23.1705],[-100.0893,23.1208],[-100.0463,23.2972],[-100.055,23.3138],[-100.1256,23.3562],[-100.0716,23.4027],[-100.0429,23.4153],[-99.906,23.3751],[-99.9521,23.5277],[-99.8988,23.6468],[-99.853,23.7264],[-99.8215,23.7487],[-99.5997,23.7668],[-99.5022,23.8904],[-99.462,23.8892],[-99.4517,23.8916],[-99.4499,23.9001],[-99.4637,23.9574],[-99.4756,23.9725],[-99.5928,24.0651],[-99.6094,24.0918],[-99.6163,24.1861],[-99.5739,24.3619],[-99.6063,24.5125],[-99.71,24.4725],[-99.7373,24.5493],[-99.7368,24.5697],[-99.6506,24.6391],[-99.587,24.6585],[-99.5563,24.6434],[-99.5473,24.6458],[-99.5,24.6743],[-99.4954,24.7167],[-99.4785,24.7398],[-99.442,24.7507],[-99.4147,24.7792],[-99.3356,24.7902],[-99.294,24.8267],[-99.2421,24.7988],[-99.1639,24.7758],[-99.192,24.8557],[-99.193,24.878],[-99.1424,24.9459],[-99.1885,25.0069],[-99.1425,25.013],[-99.1511,25.044],[-99.1453,25.052],[-99.1065,25.0489],[-99.0903,25.0749],[-99.0735,25.0789],[-99.0466,25.117],[-99.0338,25.1196],[-99.0027,25.0802],[-98.9805,25.071],[-98.9556,25.0697],[-98.8873,25.0863],[-98.4457,25.4246],[-98.4498,25.4687],[-98.5543,25.4769],[-98.561,25.5026],[-98.5528,25.9189],[-98.5557,25.9713],[-98.5689,25.9974],[-98.7824,26.0537],[-98.8302,26.0593],[-98.8461,26.0445],[-98.8888,25.9708],[-99.0199,26.0929],[-99.0372,26.1008],[-99.0585,26.0983],[-99.0798,26.0775],[-99.1092,26.0801],[-99.1331,26.0567],[-99.1522,26.084],[-99.1667,26.2498],[-99.18,26.2887],[-99.2407,26.2881],[-99.2545,26.2948],[-99.3328,26.395],[-99.3918,26.3656],[-99.4197,26.3992],[-99.4229,26.4644],[-99.3917,26.5127],[-99.3842,26.5402],[-99.3914,26.5979],[-99.4132,26.6241],[-99.4458,26.6419],[-99.5582,26.6847],[-99.6529,26.6838],[-99.6193,26.716],[-99.6097,26.7322],[-99.6045,26.7804],[-99.5626,26.835],[-99.5847,26.8584],[-99.6301,26.8839],[-99.7004,26.8963],[-99.7319,26.9323],[-99.728,26.9931],[-99.6761,27.1537],[-99.7119,27.1996],[-99.7564,27.4505],[-99.7779,27.4819],[-99.9036,27.4998],[-99.9148,27.5343],[-99.9099,27.5722],[-99.8147,27.6258],[-99.7107,27.6701]];
 
-  <!-- Mountain break -->
-  <div class="mountain-break" aria-hidden="true">
-    <svg viewBox="0 0 800 50" xmlns="http://www.w3.org/2000/svg">
-      <path d="M0 50 L80 28 L160 42 L240 12 L320 32 L380 6 L440 25 L520 35 L580 16 L660 38 L720 20 L800 30 L800 50Z" fill="#1A1A1A"/>
-    </svg>
-  </div>
+const places = [
+  { key: 'campo',      name: 'San Fernando',               c: [-98.157, 24.848] },
+  { key: 'frontera',   name: 'Reynosa',                    c: [-98.2728, 26.0955] },
+  { key: 'victoria',   name: 'Ciudad Victoria',            c: [-99.1413, 23.7369] },
+  { key: 'miquihuana', name: 'Miquihuana',                 c: [-99.7536, 23.5717] },
+  { key: 'cielo',      name: 'Reserva El Cielo',           c: [-99.215, 23.075] },
+  { key: 'pesca',      name: 'La Pesca',                   c: [-97.745, 23.787] },
+  { key: 'shenzhen',   name: 'Shenzhen',                   c: [114.0579, 22.5431] },
+  { key: 'queretaro',  name: 'Aeropuerto y parque aeroespacial', c: [-100.1856, 20.6173] }
+];
 
-  <h2>Cómo se compara con otros lugares</h2>
+/* Rutas generadas: barrido agrícola, órbita de inspección, trayecto, patrulla y recorrido de costa */
+function zigzag(x0, x1, y0, step, n) {
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const y = y0 + i * step;
+    if (i % 2 === 0) { pts.push([x0, y], [x1, y]); } else { pts.push([x1, y], [x0, y]); }
+  }
+  return pts;
+}
+function ellipse(cx, cy, rx, ry, n) {
+  const pts = [];
+  for (let i = 0; i <= n; i++) { const a = (i / n) * Math.PI * 2; pts.push([cx + rx * Math.cos(a), cy + ry * Math.sin(a)]); }
+  return pts;
+}
+function bezier(a, c, b, n) {
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, u = 1 - t;
+    pts.push([u*u*a[0] + 2*u*t*c[0] + t*t*b[0], u*u*a[1] + 2*u*t*c[1] + t*t*b[1]]);
+  }
+  return pts;
+}
+const routes = {
+  campo:     { id: 1, period: 22000, pingpong: false, coords: zigzag(-98.065, -97.975, 24.878, 0.0065, 6) },
+  frontera:  { id: 2, period: 16000, pingpong: false, coords: ellipse(-98.2728, 26.0955, 0.0055, 0.0042, 48) },
+  medicinas: { id: 3, period: 20000, pingpong: true,  coords: bezier([-99.1413, 23.7369], [-99.40, 23.80], [-99.7536, 23.5717], 60) },
+  incendio:  { id: 4, period: 18000, pingpong: false, coords: ellipse(-99.215, 23.075, 0.045, 0.03, 60) },
+  costa:     { id: 5, period: 20000, pingpong: true,  coords: [[-97.752, 23.69], [-97.745, 23.74], [-97.741, 23.787], [-97.737, 23.83], [-97.733, 23.88]] }
+};
+const hotSpot = [-99.238, 23.096];
 
-  <div class="comparison-block">
-    <div class="comparison-item">
-      <div class="comparison-place">Shenzhen, China</div>
-      <div class="comparison-year">Febrero 2024</div>
-      <div class="comparison-desc">Primera ordenanza municipal del mundo sobre economía de baja altitud. Cubre fomento, infraestructura, gestión de vuelo y seguridad. Modelo integral a nivel ciudad.</div>
-    </div>
-    <div class="comparison-item">
-      <div class="comparison-place">Florida, Estados Unidos</div>
-      <div class="comparison-year">2024</div>
-      <div class="comparison-desc">Regulación subnacional más detallada en Advanced Air Mobility dentro de EE.&nbsp;UU. Define zonas, incentivos y coordinación con la FAA federal.</div>
-    </div>
-    <div class="comparison-item">
-      <div class="comparison-place">Querétaro, México</div>
-      <div class="comparison-year">2005–presente</div>
-      <div class="comparison-desc">Clúster aeroespacial con 80+ empresas y 8,000+ empleos. Construido con programas e infraestructura, sin ley específica. Demuestra que el modelo funciona en México.</div>
-    </div>
-  </div>
+/* Vista del estado: se calcula para que Tamaulipas quepa en el espacio libre de la pantalla */
+const TAM_BOUNDS = [[-100.15, 22.2], [-97.12, 27.7]];
+const STATE_VIEW = { lng: -98.65, lat: 24.95, zoom: 6.6, pitch: 0, bearing: 0 };
 
-  <div class="bar-chart" aria-label="Línea de tiempo comparativa">
-    <svg viewBox="0 0 600 130" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Línea de tiempo: Querétaro 2005, Shenzhen y Florida 2024, Nuevo León 2026">
-      <line x1="60" y1="65" x2="560" y2="65" stroke="#1A1A1A" stroke-width="1" stroke-opacity="0.15"/>
-      <!-- Querétaro -->
-      <circle cx="100" cy="65" r="4" fill="#6B6B6B"/>
-      <line x1="100" y1="45" x2="100" y2="61" stroke="#6B6B6B" stroke-width="1" stroke-dasharray="2 2"/>
-      <text x="100" y="38" text-anchor="middle" font-family="Fraunces, serif" font-size="12" font-weight="600" fill="#6B6B6B">2005</text>
-      <text x="100" y="85" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="10" fill="#1A1A1A">Querétaro</text>
-      <text x="100" y="98" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="8" fill="#6B6B6B">Sin ley</text>
-      <!-- Shenzhen / Florida -->
-      <circle cx="380" cy="65" r="4" fill="#6B6B6B"/>
-      <line x1="380" y1="45" x2="380" y2="61" stroke="#6B6B6B" stroke-width="1" stroke-dasharray="2 2"/>
-      <text x="380" y="38" text-anchor="middle" font-family="Fraunces, serif" font-size="12" font-weight="600" fill="#6B6B6B">2024</text>
-      <text x="380" y="85" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="10" fill="#1A1A1A">Shenzhen · Florida</text>
-      <text x="380" y="98" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="8" fill="#6B6B6B">Primeras leyes</text>
-      <!-- Nuevo León -->
-      <circle cx="500" cy="65" r="6" fill="#1B4332"/>
-      <line x1="500" y1="42" x2="500" y2="59" stroke="#1B4332" stroke-width="1.5"/>
-      <text x="500" y="34" text-anchor="middle" font-family="Fraunces, serif" font-size="13" font-weight="700" fill="#1B4332">2026</text>
-      <text x="500" y="85" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="10" font-weight="600" fill="#1B4332">Nuevo León</text>
-      <text x="500" y="98" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="8" fill="#1B4332">Oportunidad</text>
-      <!-- Span arrow -->
-      <line x1="105" y1="112" x2="495" y2="112" stroke="#1B4332" stroke-width="1" opacity="0.3"/>
-      <polygon points="495,109 502,112 495,115" fill="#1B4332" opacity="0.3"/>
-      <text x="300" y="125" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="8" fill="#6B6B6B">21 años de ventana</text>
-    </svg>
-  </div>
+/* ──── MAPA ──── */
+const isNarrow = () => window.innerWidth <= 768;
+function adjZoom(z) {
+  if (!isNarrow()) return z;
+  return z < 8 ? z - 0.95 : z - 0.45;
+}
 
-  <div class="section-divider"></div>
+const map = new maplibregl.Map({
+  container: 'map',
+  style: {
+    version: 8,
+    sources: {
+      'satellite': {
+        type: 'raster',
+        tiles: ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+        tileSize: 256,
+        attribution: 'Imagen © Esri, Maxar · Límite estatal: Natural Earth'
+      }
+    },
+    layers: [{ id: 'satellite-layer', type: 'raster', source: 'satellite' }]
+  },
+  bounds: TAM_BOUNDS,
+  fitBoundsOptions: { padding: 40 },
+  interactive: false
+});
 
-  <h2>Estado de la iniciativa</h2>
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  <p>La ley tiene 11 capítulos proyectados y aproximadamente 60 artículos. Este es el avance:</p>
+/* Medición de rutas para mover el dron a lo largo de ellas */
+function measure(coords) {
+  const seg = []; let total = 0;
+  for (let i = 1; i < coords.length; i++) {
+    const a = coords[i-1], b = coords[i];
+    const d = Math.hypot((b[0]-a[0]) * 102, (b[1]-a[1]) * 111);
+    seg.push({ a, b, d, s: total }); total += d;
+  }
+  return { seg, total };
+}
+Object.values(routes).forEach(r => { r.m = measure(r.coords); });
+function pointAt(r, f) {
+  const { seg, total } = r.m;
+  const t = f * total;
+  let lo = 0, hi = seg.length - 1;
+  while (lo < hi) { const m = (lo + hi + 1) >> 1; if (seg[m].s <= t) lo = m; else hi = m - 1; }
+  const g = seg[lo], k = g.d ? Math.min(1, (t - g.s) / g.d) : 0;
+  return [g.a[0] + (g.b[0]-g.a[0]) * k, g.a[1] + (g.b[1]-g.a[1]) * k];
+}
 
-  <!-- Visual progress -->
-  <div class="progress-vis" aria-label="4 de 11 capítulos completados">
-    <svg viewBox="0 0 600 40" xmlns="http://www.w3.org/2000/svg" role="img">
-      <rect x="0" y="12" width="600" height="16" rx="2" fill="rgba(27,67,50,0.06)"/>
-      <rect x="0" y="12" width="218" height="16" rx="2" fill="#1B4332"/>
-      <rect x="218" y="12" width="110" height="16" fill="#8B6914" opacity="0.4"/>
-      <text x="109" y="24" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="9" font-weight="600" fill="#FAF8F4">4 listos</text>
-      <text x="273" y="24" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="9" font-weight="600" fill="#8B6914">2 en curso</text>
-      <text x="464" y="24" text-anchor="middle" font-family="Inter Tight, sans-serif" font-size="9" fill="#6B6B6B">5 pendientes</text>
-      <text x="600" y="8" text-anchor="end" font-family="Fraunces, serif" font-size="10" fill="#6B6B6B">11 capítulos</text>
-    </svg>
-  </div>
+let activeRoute = null, hotOn = false, mapReady = false;
 
-  <ul class="stage-list">
-    <li><span class="stage-status done">Listo</span> Exposición de motivos y fundamento constitucional</li>
-    <li><span class="stage-status done">Listo</span> Capítulos de disposiciones generales y definiciones</li>
-    <li><span class="stage-status done">Listo</span> Capítulo de gobernanza y Consejo Estatal</li>
-    <li><span class="stage-status done">Listo</span> Capítulo de fomento e incentivos económicos</li>
-    <li><span class="stage-status wip">En curso</span> Capítulo de infraestructura y uso de suelo</li>
-    <li><span class="stage-status wip">En curso</span> Capítulo de formación de capital humano</li>
-    <li><span class="stage-status pending">Pendiente</span> Capítulo de seguridad y convivencia con comunidades</li>
-    <li><span class="stage-status pending">Pendiente</span> Capítulos de transitorios y régimen sancionatorio</li>
-    <li><span class="stage-status pending">Pendiente</span> Revisión jurídica integral y dictamen</li>
-  </ul>
+map.on('load', () => {
+  mapReady = true;
+  const ring = TAM.length ? TAM.concat([TAM[0]]) : [];
+  map.addSource('tam', { type: 'geojson', data: { type: 'Feature', geometry: { type: 'LineString', coordinates: ring } } });
+  map.addSource('tam-area', { type: 'geojson', data: { type: 'Feature', geometry: { type: 'Polygon', coordinates: [ring] } } });
+  map.addLayer({ id: 'tam-fill', type: 'fill', source: 'tam-area', paint: { 'fill-color': '#A83050', 'fill-opacity': ['interpolate', ['linear'], ['zoom'], 5, 0.14, 9, 0.03] } });
+  map.addLayer({ id: 'tam-glow', type: 'line', source: 'tam',
+    paint: { 'line-color': '#A83050', 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 8, 9, 16], 'line-blur': 8, 'line-opacity': 0.55 } });
+  map.addLayer({ id: 'tam-line', type: 'line', source: 'tam', layout: { 'line-join': 'round' },
+    paint: { 'line-color': '#F3B7C7', 'line-width': ['interpolate', ['linear'], ['zoom'], 4, 1.2, 9, 2.4], 'line-opacity': 0.9 } });
 
-  <div class="closing">
-    <p>La ley está en redacción. Las decisiones que se tomen ahora definirán por una década si Nuevo León lidera o sigue.</p>
-    <div class="author">Documento de divulgación del proyecto. Raúl Gabino, mayo 2026.</div>
-  </div>
+  map.addSource('routes', { type: 'geojson', data: {
+    type: 'FeatureCollection',
+    features: Object.entries(routes).map(([k, r]) => ({ type: 'Feature', id: r.id, properties: { key: k }, geometry: { type: 'LineString', coordinates: r.coords } }))
+  } });
+  map.addLayer({ id: 'routes-line', type: 'line', source: 'routes', layout: { 'line-cap': 'round', 'line-join': 'round' },
+    paint: {
+      'line-color': '#FFD25A',
+      'line-width': ['interpolate', ['linear'], ['zoom'], 8, 1.5, 14, 3],
+      'line-dasharray': [1.5, 1.5],
+      'line-opacity': ['case', ['boolean', ['feature-state', 'on'], false], 0.85, 0]
+    } });
 
-</main>
+  map.addSource('hot', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+  map.addLayer({ id: 'hot-glow', type: 'circle', source: 'hot', paint: { 'circle-radius': 18, 'circle-color': '#FF6A2B', 'circle-blur': 0.9, 'circle-opacity': 0.75 } });
+  map.addLayer({ id: 'hot-dot', type: 'circle', source: 'hot', paint: { 'circle-radius': 5, 'circle-color': '#FF6A2B', 'circle-stroke-width': 2, 'circle-stroke-color': '#fff' } });
+
+  map.addSource('drone', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } });
+  map.addLayer({ id: 'drone-glow', type: 'circle', source: 'drone', paint: { 'circle-radius': 14, 'circle-color': '#FFD25A', 'circle-blur': 0.8, 'circle-opacity': 0.7 } });
+  map.addLayer({ id: 'drone-dot', type: 'circle', source: 'drone', paint: { 'circle-radius': 5.5, 'circle-color': '#FFD25A', 'circle-stroke-width': 2, 'circle-stroke-color': '#72192C' } });
+
+  const t0 = performance.now();
+  const tick = now => {
+    if (activeRoute) {
+      const r = routes[activeRoute];
+      let f = reduceMotion ? 0.35 : ((now - t0) % r.period) / r.period;
+      if (r.pingpong) f = f < 0.5 ? f * 2 : 2 - f * 2;
+      map.getSource('drone').setData({ type: 'Feature', geometry: { type: 'Point', coordinates: pointAt(r, f) } });
+    }
+    if (hotOn && !reduceMotion) {
+      const p = (Math.sin((now - t0) / 380) + 1) / 2;
+      map.setPaintProperty('hot-glow', 'circle-radius', 14 + p * 14);
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+
+  if (currentSection) applyLayers(currentSection);
+});
+
+/* Etiquetas de lugares */
+const labels = {};
+places.forEach(p => {
+  const el = document.createElement('div');
+  el.className = 'place-label';
+  el.textContent = p.name;
+  labels[p.key] = el;
+  new maplibregl.Marker({ element: el, anchor: 'left' }).setLngLat(p.c).addTo(map);
+});
+
+/* ──── SCROLLY ──── */
+const sections = document.querySelectorAll('[data-chapter]');
+const progressIndicator = document.getElementById('progressIndicator');
+sections.forEach((s, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'progress-dot';
+  dot.addEventListener('click', () => s.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' }));
+  progressIndicator.appendChild(dot);
+});
+const progressDots = document.querySelectorAll('.progress-dot');
+
+sections.forEach(s => {
+  const card = s.querySelector('.chapter-card');
+  const title = s.dataset.title;
+  if (!card || !title) return;
+  const tag = card.querySelector('.chapter-tag');
+  const loc = document.createElement('div');
+  loc.className = 'chapter-loc';
+  loc.textContent = title;
+  if (tag && tag.nextSibling) tag.parentNode.insertBefore(loc, tag.nextSibling);
+  else card.insertBefore(loc, card.firstChild);
+});
+
+let currentChapter = -1, currentSection = null;
+
+function applyLayers(section) {
+  const on = (section.dataset.labels || '').split(',').filter(Boolean);
+  Object.entries(labels).forEach(([k, el]) => el.classList.toggle('on', on.includes(k)));
+  activeRoute = section.dataset.route || null;
+  hotOn = section.dataset.hot === '1';
+  if (!mapReady) return;
+  Object.values(routes).forEach(r => map.setFeatureState({ source: 'routes', id: r.id }, { on: routes[activeRoute] === r }));
+  if (!activeRoute) map.getSource('drone').setData({ type: 'FeatureCollection', features: [] });
+  map.getSource('hot').setData(hotOn ? { type: 'Feature', geometry: { type: 'Point', coordinates: hotSpot } } : { type: 'FeatureCollection', features: [] });
+}
+
+/* Espacio que ocupa el texto, para centrar el mapa en lo que queda libre */
+function paddingFor(section) {
+  const w = window.innerWidth, h = window.innerHeight;
+  const isCh = section.classList.contains('chapter');
+  const isHero = section.classList.contains('hero-section');
+  if (isNarrow()) {
+    if (isCh) return { top: 0, bottom: Math.round(h * 0.38), left: 0, right: 0 };
+    if (isHero) return { top: 0, bottom: Math.round(h * 0.52), left: 0, right: 0 };
+    return { top: 0, bottom: 0, left: 0, right: 0 };
+  }
+  if (isCh) {
+    const side = Math.min(620, w * 0.42);
+    return section.classList.contains('right') ? { top: 0, bottom: 0, left: 0, right: side } : { top: 0, bottom: 0, left: side, right: 0 };
+  }
+  if (isHero) return { top: 0, bottom: Math.round(h * 0.22), left: Math.round(w * 0.42), right: 0 };
+  return { top: 0, bottom: 0, left: 0, right: 0 };
+}
+
+/* Zoom para que el estado quepa en el área libre (proyección Mercator, mundo de 512 px en zoom 0) */
+function mercY(lat) { const r = lat * Math.PI / 180; return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2; }
+function invMercY(y) { return Math.atan(Math.sinh(Math.PI * (1 - 2 * y))) * 180 / Math.PI; }
+function stateCamera(padding) {
+  const el = map.getContainer(), m = 36;
+  const availW = Math.max(120, el.clientWidth - padding.left - padding.right - 2 * m);
+  const availH = Math.max(120, el.clientHeight - padding.top - padding.bottom - 2 * m);
+  const [[w, s], [e, n]] = TAM_BOUNDS;
+  const dx = (e - w) / 360, yN = mercY(n), yS = mercY(s), dy = yS - yN;
+  const zoom = Math.log2(Math.min(availW / (dx * 512), availH / (dy * 512)));
+  return { center: [(w + e) / 2, invMercY((yN + yS) / 2)], zoom: Math.min(zoom, 8) };
+}
+
+function cameraFor(section, padding) {
+  if (section.dataset.view === 'estado') {
+    const c = stateCamera(padding);
+    const pitch = section.dataset.pitch ? parseFloat(section.dataset.pitch) : 0;
+    return { center: c.center, zoom: c.zoom, pitch, bearing: 0, padding };
+  }
+  return {
+    center: [parseFloat(section.dataset.lng), parseFloat(section.dataset.lat)],
+    zoom: adjZoom(parseFloat(section.dataset.zoom)),
+    pitch: parseFloat(section.dataset.pitch),
+    bearing: parseFloat(section.dataset.bearing),
+    padding
+  };
+}
+
+function activateChapter(section) {
+  const chapter = parseInt(section.dataset.chapter);
+  if (chapter === currentChapter) return;
+  currentChapter = chapter; currentSection = section;
+  const cam = cameraFor(section, paddingFor(section));
+  map.flyTo({
+    ...cam,
+    duration: reduceMotion ? 0 : 2800, essential: true, curve: 1.4
+  });
+  applyLayers(section);
+  const idx = Array.from(sections).indexOf(section);
+  progressDots.forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) activateChapter(e.target); });
+}, { rootMargin: '-40% 0px -40% 0px', threshold: 0 });
+sections.forEach(s => observer.observe(s));
+activateChapter(sections[0]);
+</script>
 
 </body>
 </html>
