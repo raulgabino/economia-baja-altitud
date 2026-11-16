@@ -52,6 +52,13 @@
       z-index: 1;
       background: #050505;
     }
+    #mapDim {
+      position: fixed; inset: 0; z-index: 1;
+      background: rgba(5,5,7,0.62);
+      opacity: 0; pointer-events: none;
+      transition: opacity .9s ease;
+    }
+    #mapDim.on { opacity: 1; }
     .maplibregl-ctrl-attrib {
       background: rgba(0,0,0,0.5) !important;
       color: rgba(255,255,255,0.6) !important;
@@ -470,6 +477,7 @@
 <body>
 
 <div id="map" role="img" aria-label="Mapa satelital que acompaña la lectura y se mueve a cada lugar mencionado"></div>
+<div id="mapDim" aria-hidden="true"></div>
 <div class="progress-indicator" id="progressIndicator" aria-hidden="true"></div>
 
 <div class="scrolly">
@@ -506,8 +514,7 @@
   </section>
 
   <!-- 02 SHENZHEN -->
-  <section class="chapter right" data-chapter="2"
-           data-lat="22.5431" data-lng="114.0579" data-zoom="11.6" data-pitch="38" data-bearing="0" data-labels="shenzhen"
+  <section class="chapter right" data-chapter="2" data-view="estado" data-dim="1" data-labels=""
            data-title="Shenzhen, China">
     <div class="chapter-card">
       <div class="chapter-num">02 / 11</div>
@@ -568,8 +575,8 @@
 
   <!-- 05 FRONTERA -->
   <section class="chapter" data-chapter="5"
-           data-lat="26.0955" data-lng="-98.2728" data-zoom="14.4" data-pitch="58" data-bearing="-25" data-labels="frontera" data-route="frontera"
-           data-title="Reynosa">
+           data-lat="24.1060" data-lng="-98.4102" data-zoom="15.2" data-pitch="58" data-bearing="-30" data-labels="puente" data-route="puente"
+           data-title="Puente San Manuel, carretera Jiménez-Abasolo">
     <div class="chapter-card">
       <div class="chapter-num">05 / 11</div>
       <span class="chapter-tag">Un día en Tamaulipas · 10:00</span>
@@ -577,10 +584,11 @@
       <h2>Revisar un puente<br><strong>sin cerrar un carril.</strong></h2>
       <div class="chapter-image"><img loading="lazy" width="960" height="640" src="img/inspeccion_puente.webp" alt="Vista aérea de un puente tomada desde un dron durante una inspección."></div>
       <p class="photo-cap">Vista desde un dron durante la inspección de un puente en Italia. Foto: FedericaGaspari, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>.</p>
-      <p>Un dron recorre la estructura de un puente internacional, una línea eléctrica o un ducto. Con miles de fotos se arma un modelo en 3D que muestra dónde hay grietas o corrosión. La inspección se hace sin andamios y sin detener el tráfico.</p>
+      <p>Un dron recorre la estructura de un puente de la red carretera estatal. Con miles de fotos se arma un modelo en 3D que muestra dónde hay grietas, socavación o corrosión. La revisión se hace sin andamios y sin detener el tráfico.</p>
+      <p>En 2026, la Secretaría de Obras Públicas del estado emprendió la rehabilitación del puente San Manuel, en el kilómetro 14+300 de la carretera Jiménez-Abasolo. Con revisiones periódicas, los daños se detectan antes de que la reparación crezca.</p>
       <div class="chapter-stat">
-        <div class="cs-num">19</div>
-        <div class="cs-label">cruces fronterizos de Tamaulipas con Texas, según la Secretaría de Economía estatal</div>
+        <div class="cs-num">+31 mdp</div>
+        <div class="cs-label">inversión estatal en la rehabilitación del puente San Manuel</div>
       </div>
     </div>
   </section>
@@ -635,7 +643,7 @@
   </section>
 
   <!-- 09 QUÉ HARÍA LA LEY -->
-  <section class="chapter" data-chapter="9" data-view="estado" data-labels="campo,frontera,victoria,miquihuana,cielo,pesca"
+  <section class="chapter" data-chapter="9" data-view="estado" data-labels="campo,puente,victoria,miquihuana,cielo,pesca"
            data-title="Lo que haría la ley">
     <div class="chapter-card wide">
       <div class="chapter-num">09 / 11</div>
@@ -734,7 +742,7 @@
         <li>Rutas, puntos de despegue y vuelos de carga en Shenzhen al cierre de 2024. <a href="https://www.eyeshenzhen.com/content/2025-05/26/content_31580349.htm" target="_blank" rel="noopener">Eye Shenzhen, mayo de 2025</a>.</li>
         <li>Entrada en vigor de la Ley de Aviación Civil reformada de China (1 de julio de 2026) y su capítulo sobre economía de baja altitud. <a href="https://www.chinadailyhk.com/article/638587" target="_blank" rel="noopener">China Daily, agosto de 2026</a>.</li>
         <li>Tamaulipas, primer lugar nacional en sorgo grano, y superficie sembrada en San Fernando. <a href="https://www.gob.mx/cms/uploads/attachment/file/873726/Panorama_FA_2023_TAMPS.pdf" target="_blank" rel="noopener">SIAP, Panorama Agroalimentario Tamaulipas 2023</a>.</li>
-        <li>Diecinueve cruces fronterizos de Tamaulipas. <a href="https://thelogisticsworld.com/comercio-internacional/se-estan-ampliando-y-modernizando-3-puentes-para-el-comercio-exterior-en-nuevo-laredo-y-reynosa/" target="_blank" rel="noopener">The Logistics World, julio de 2026</a>.</li>
+        <li>Rehabilitación del puente San Manuel, km 14+300 de la carretera Jiménez-Abasolo, por la Secretaría de Obras Públicas estatal, con inversión superior a 31 millones de pesos. <a href="https://www.cronica.com.mx/estados/2026/09/03/tamaulipas-rehabilita-puente-san-manuel-en-abasolo/" target="_blank" rel="noopener">La Crónica, septiembre de 2026</a>.</li>
         <li>Más de 80 empresas aeroespaciales en Querétaro. <a href="https://www.adn40.mx/mexico/2026-04-21/ni-corregidora-ni-el-marques-el-municipio-de-queretaro-donde-se-inauguro-una-celda-de-produccion-aeroespacial/" target="_blank" rel="noopener">ADN40, abril de 2026</a>. Principales empresas: <a href="https://mexicoindustry.com/noticia/las-industrias-que-definen-el-perfil-productivo-de-queretaro" target="_blank" rel="noopener">Mexico Industry</a>. Llegada de ITP Aero en 1998: <a href="https://clusterindustrial.com.mx/queretaro-promueve-su-industria-aeroespacial-en-farnborough-y-consolida-inversiones-con-itp-aero/" target="_blank" rel="noopener">Cluster Industrial</a>.</li>
         <li>Marco federal: <a href="https://www.diputados.gob.mx/LeyesBiblio/pdf/LAC.pdf" target="_blank" rel="noopener">Ley de Aviación Civil</a> y NOM-107-SCT3-2019 sobre aeronaves pilotadas a distancia.</li>
       </ol>
@@ -749,7 +757,7 @@
       </ol>
       <h4>Mapa</h4>
       <ol>
-        <li>Imagen satelital: Esri, Maxar. Límite estatal: Natural Earth, dominio público. Las rutas de dron son ilustrativas.</li>
+        <li>Imagen satelital: Esri, Maxar. Límite estatal: Natural Earth, dominio público. Ubicación del puente San Manuel: aproximada, a partir del kilometraje oficial y de OpenStreetMap. Las rutas de dron son ilustrativas.</li>
       </ol>
     </details>
   </div>
@@ -768,12 +776,11 @@ const TAM = [[-99.7107,27.6701],[-99.7004,27.6592],[-99.6647,27.6594],[-99.6449,
 
 const places = [
   { key: 'campo',      name: 'San Fernando',               c: [-98.157, 24.848] },
-  { key: 'frontera',   name: 'Reynosa',                    c: [-98.2728, 26.0955] },
+  { key: 'puente',     name: 'Puente San Manuel',          c: [-98.4102, 24.1060] },
   { key: 'victoria',   name: 'Ciudad Victoria',            c: [-99.1413, 23.7369] },
   { key: 'miquihuana', name: 'Miquihuana',                 c: [-99.7536, 23.5717] },
   { key: 'cielo',      name: 'Reserva El Cielo',           c: [-99.215, 23.075] },
   { key: 'pesca',      name: 'La Pesca',                   c: [-97.745, 23.787] },
-  { key: 'shenzhen',   name: 'Shenzhen',                   c: [114.0579, 22.5431] },
   { key: 'queretaro',  name: 'Aeropuerto y parque aeroespacial', c: [-100.1856, 20.6173] }
 ];
 
@@ -801,7 +808,7 @@ function bezier(a, c, b, n) {
 }
 const routes = {
   campo:     { id: 1, period: 22000, pingpong: false, coords: zigzag(-98.065, -97.975, 24.878, 0.0065, 6) },
-  frontera:  { id: 2, period: 16000, pingpong: false, coords: ellipse(-98.2728, 26.0955, 0.0055, 0.0042, 48) },
+  puente:    { id: 2, period: 16000, pingpong: false, coords: ellipse(-98.4102, 24.1060, 0.0034, 0.0026, 48) },
   medicinas: { id: 3, period: 20000, pingpong: true,  coords: bezier([-99.1413, 23.7369], [-99.40, 23.80], [-99.7536, 23.5717], 60) },
   incendio:  { id: 4, period: 18000, pingpong: false, coords: ellipse(-99.215, 23.075, 0.045, 0.03, 60) },
   costa:     { id: 5, period: 20000, pingpong: true,  coords: [[-97.752, 23.69], [-97.745, 23.74], [-97.741, 23.787], [-97.737, 23.83], [-97.733, 23.88]] }
@@ -947,7 +954,9 @@ sections.forEach(s => {
 
 let currentChapter = -1, currentSection = null;
 
+const mapDim = document.getElementById('mapDim');
 function applyLayers(section) {
+  mapDim.classList.toggle('on', section.dataset.dim === '1');
   const on = (section.dataset.labels || '').split(',').filter(Boolean);
   Object.entries(labels).forEach(([k, el]) => el.classList.toggle('on', on.includes(k)));
   activeRoute = section.dataset.route || null;
